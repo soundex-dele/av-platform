@@ -1,0 +1,12 @@
+[submodule "graphflow-cpp"]
+	path = graphflow-cpp
+	url = https://github.com/soundex-dele/graphflow-cpp.git
+[submodule "livekit-cpp"]
+	path = livekit-cpp
+	url = https://github.com/soundex-dele/livekit-cpp.git
+[submodule "livekit-sdk-cpp"]
+	path = livekit-sdk-cpp
+	url = https://github.com/soundex-dele/livekit-sdk-cpp.git
+[submodule "webrtc"]
+	path = webrtc
+	url = https://github.com/soundex-dele/webrtc.git
