@@ -6,6 +6,8 @@
 
 ## 架构文档
 
+- [视频会议客户端 macOS 构建](livekit-sdk-cpp/examples/conference_viewer/README.md#macos-构建与打包)：Intel / Apple Silicon 构建预设、Retina 适配、独立 `.app` 打包及无窗口验证方法。
+
 - [目录结构与多业务边界](docs/architecture/repository-layout.md)：客户端按 APP/端组织，业务服务按领域组织，包含重构后的构建与 API 入口。
 - [目录重构验证](docs/integration/layout-refactor/VALIDATION.md)：构建矩阵、模块测试、路由隔离与无桌面操作的远控端到端结果。
 
