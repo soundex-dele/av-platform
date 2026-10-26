@@ -1,6 +1,6 @@
 # Private RTC platform implementation
 
-> 2026-10-26 归档快照，来源：[livekit-cpp/docs/IMPLEMENTATION.md](../../livekit-cpp/docs/IMPLEMENTATION.md)（提交 `da4732d`）。正文中的工作区路径和验证状态保留原始记录；本次仅归档文档，未迁移测试产物或重新验收。
+> 2026-10-26 归档快照，来源：[livekit-cpp/docs/IMPLEMENTATION.md](../../../livekit-cpp/docs/IMPLEMENTATION.md)（提交 `da4732d`）。正文中的工作区路径和验证状态保留原始记录；本次仅归档文档，未迁移测试产物或重新验收。
 
 ## Current status: paused (2026-10-26)
 

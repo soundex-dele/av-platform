@@ -1,6 +1,6 @@
 # Linux 媒体与 TURN 验证
 
-> 2026-10-26 归档快照，来源：[livekit-cpp/docs/NETWORK_VALIDATION.md](../../livekit-cpp/docs/NETWORK_VALIDATION.md)（提交 `da4732d`）。正文中的工作区路径和验证状态保留原始记录；本次仅归档文档，未迁移测试产物或重新验收。
+> 2026-10-26 归档快照，来源：[livekit-cpp/docs/NETWORK_VALIDATION.md](../../../livekit-cpp/docs/NETWORK_VALIDATION.md)（提交 `da4732d`）。正文中的工作区路径和验证状态保留原始记录；本次仅归档文档，未迁移测试产物或重新验收。
 
 以下是开发验收入口，完整交付范围仍以 [IMPLEMENTATION.md](IMPLEMENTATION.md)
 为准。服务端继续使用 libwebrtc 的 ICE、DTLS/SRTP、RTP/RTCP、重传、拥塞控制和

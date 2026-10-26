@@ -7,24 +7,24 @@
 依赖 VS 2022 C++、Windows SDK、CMake、vcpkg 静态依赖、Node 22+、Go 1.25+。沿用 SDK 的 `/MT` 和固定 WebRTC 源码；不复制单独的 SDK `.lib`。首次获取媒体服务依赖时：
 
 ```powershell
-.\scripts\build-remote-control.ps1 -BootstrapMedia
+.\scripts\build\remote-control.ps1 -BootstrapMedia
 ```
 
 设置 `LIVEKIT_API_KEY` 与 `LIVEKIT_API_SECRET`（至少 24 字符），仅供服务进程使用。然后启动：
 
 ```powershell
-.\scripts\start-remote-control.ps1 -AdvertisedHost 192.168.1.20
+.\scripts\run\remote-control.ps1 -AdvertisedHost 192.168.1.20
 ```
 
 将地址换成部署机器的局域网 IP。脚本在当前终端保持运行，Ctrl+C 清理它启动的两个服务。允许客户端访问业务 HTTP 8080、媒体 HTTP/WebSocket 7880、媒体 UDP 50000–50100；脚本不自动修改防火墙。
 
-在被控 Windows 运行 `livekit-sdk-cpp/out/windows-x64/Release/av_remote_host.exe`，填写业务地址并创建连接码。控制者在 Chrome/Edge 打开同一业务地址，输入连接码和称呼。Windows 用户确认请求后才会发布屏幕。点击网页画面启用输入；失焦后需要再次点击。关闭或最小化正在控制的被控窗口会结束控制；也可使用停止按钮或 **Ctrl+Alt+F10**。F10 冲突时尝试 **Ctrl+Alt+F9**，界面显示实际注册的快捷键；两者均不可用时仍可启动，界面提示使用停止按钮或关闭窗口。Windows 为调试器保留 F12，不再使用它注册全局热键。
+在被控 Windows 运行 `livekit-app/out/remote-control-desktop/Release/av_remote_host.exe`，填写业务地址并创建连接码。控制者在 Chrome/Edge 打开业务地址下的 `/apps/remote-control/`，输入连接码和称呼。Windows 用户确认请求后才会发布屏幕。点击网页画面启用输入；失焦后需要再次点击。关闭或最小化正在控制的被控窗口会结束控制；也可使用停止按钮或 **Ctrl+Alt+F10**。F10 冲突时尝试 **Ctrl+Alt+F9**，界面显示实际注册的快捷键；两者均不可用时仍可启动，界面提示使用停止按钮或关闭窗口。Windows 为调试器保留 F12，不再使用它注册全局热键。
 
 连接码显示在只读文本框中，支持选中后 Ctrl+C，也可点击旁边的 Copy 按钮一键复制。连接码 10 位、5 分钟有效，仅供一次申请；拒绝、超时、断线或结束后点击创建按钮生成新码。称呼由申请者自报，不代表经过认证的账号。首版无账号、无人值守、多屏选择、音频、远程剪贴板共享、文件传输、中文 IME 和安全桌面控制。
 
 ## 部署配置
 
-`livekit-business-api` 参数：`-listen`、`-db`、`-web`、`-media-api`（受信 HTTP 管理地址）、`-media-url`（客户端可达 ws/wss 地址）。`-tls-cert` 与 `-tls-key` 可直接启用 HTTPS；客户端使用系统信任的证书，不忽略证书错误。
+`livekit-business-api` 参数：`-listen`、`-db`、`-remote-control-web`、`-media-api`（受信 HTTP 管理地址）、`-media-url`（客户端可达 ws/wss 地址）。`-tls-cert` 与 `-tls-key` 可直接启用 HTTPS；客户端使用系统信任的证书，不忽略证书错误。
 
 开发启动脚本提供 HTTP/WS 配置，只面向可信开发局域网。TLS 部署时将网页与 `/api/` 放在同一 HTTPS origin；将媒体 `/rtc` 通过支持 WebSocket 的反向代理暴露为 WSS，并正确配置 `-media-url`。媒体 UDP 与 TLS WebSocket 是不同链路，需要分别放行。公网 NAT/TURN 和公网证书部署不属于已验收范围。
 
@@ -45,13 +45,13 @@ SQLite 使用 WAL，单业务进程部署；迁移版本在 `schema_migrations`�
 本次执行结果见 [验证记录](VALIDATION.md)。
 
 ```powershell
-cd livekit-app/web
+cd livekit-app/apps/remote-control/web
 npm test
 npm run test:integration
 ```
 
 端到端测试自动启动专用业务服务、C++ SFU、两个无窗口被控 fixture 和无头 Chromium。fixture **只发布合成视频，只记录输入，不采集或控制用户桌面**。可通过 `RC_MEDIA_SERVER`、`RC_BUSINESS_SERVER`、`RC_HOST_FIXTURE`、`RC_CHROME`、`RC_RESULTS` 指定二进制和输出。结果含二进制 SHA-256、解码帧数、事件记录和网页截图。
 
-C++ 入口：`ctest --test-dir livekit-sdk-cpp/out/windows-x64 -C Release -R '^(remote_control|remote_host_render|sdk|media_graph)$' --output-on-failure`。业务入口：在 `livekit-server` 执行 `go test ./...`。
+C++ 入口：`ctest --test-dir livekit-sdk-cpp/out/windows-x64 -C Release -R '^(remote_control|sdk|media_graph)$' --output-on-failure`。桌面端入口：`ctest --test-dir livekit-app/out/remote-control-desktop -C Release --output-on-failure`。业务入口：在 `livekit-server` 执行 `go test ./...`。
 
 实际设备人工验收必须另行执行：两台机器的屏幕质量、DPI、拖动、组合键、全局急停、关闭窗口、断网释放及权限受限窗口。不把合成媒体、输入记录器或截图测试当作这些设备验收已完成。

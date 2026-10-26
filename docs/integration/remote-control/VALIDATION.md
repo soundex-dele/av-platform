@@ -23,7 +23,7 @@ ImGui 通过 SDL dummy + software renderer 渲染 idle/waiting/pending/approved/
 
 ## 最终跨仓库集成
 
-运行入口：`livekit-app/web/tests/integration.mjs`。最终证据目录：
+运行入口：`livekit-app/apps/remote-control/web/tests/integration.mjs`。最终证据目录：
 
 `out/remote-control/2026-10-26T05-08-41-489Z/`
 

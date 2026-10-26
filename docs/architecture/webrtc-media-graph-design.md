@@ -1,10 +1,10 @@
-> 2026-10-26 更新：采集、视频编码、解码、渲染和录制已拆为独立节点，通过 GraphEngine::loadFromNodes 和强类型事件边创建实际媒体图。视频发送采用图侧真实编码 + 标准 Custom VideoTrackSource/native buffer + EncoderFactory 透传适配，不修改 WebRTC 源码。WebRTC 仍调度透传触发帧；音频编解码保留原生调度。当前实现和边界见 [实现说明](../livekit-sdk-cpp/docs/media-graph-webrtc.md)。
+> 2026-10-26 更新：采集、视频编码、解码、渲染和录制已拆为独立节点，通过 GraphEngine::loadFromNodes 和强类型事件边创建实际媒体图。视频发送采用图侧真实编码 + 标准 Custom VideoTrackSource/native buffer + EncoderFactory 透传适配，不修改 WebRTC 源码。WebRTC 仍调度透传触发帧；音频编解码保留原生调度。当前实现和边界见 [实现说明](../../livekit-sdk-cpp/docs/media-graph-webrtc.md)。
 
 # WebRTC 节点化接入 Media Graph 方案
 
-日期：2026-10-26。状态：设计基线，首版实施情况见下方链接。本文类型、接口、目录和执行模式描述设计目标，实际支持范围以实现说明为准。
+日期：2026-10-26。状态：设计基线，首版实施情况见下方链接。目录重构后的归属见 [仓库结构](repository-layout.md)。本文类型、接口、目录和执行模式描述原设计目标，实际支持范围以实现说明为准。
 
-后续实施记录：同日已落地 RTC 节点与四类 Factory 的首版闭环，实际接口、验证和未覆盖范围见 [实现说明](../livekit-sdk-cpp/docs/media-graph-webrtc.md)。下文保留设计基线，不将全部后续目标标记为已实现。
+后续实施记录：同日已落地 RTC 节点与四类 Factory 的首版闭环，实际接口、验证和未覆盖范围见 [实现说明](../../livekit-sdk-cpp/docs/media-graph-webrtc.md)。下文保留设计基线，不将全部后续目标标记为已实现。
 
 目标：基于 [SDK 新架构](sdk-architecture.md)，将采集、编码、解码、渲染拆为独立节点，通过 WebRTC EncoderFactory / DecoderFactory 接入 RTC。首发建议 Windows x64、CPU I420、VP8 + Opus；其他格式与平台按能力扩展。
 
@@ -24,7 +24,7 @@
 
 | 依据 | 当前实现 | 接入工作 |
 | --- | --- | --- |
-| `livekit-sdk-cpp/src/room.cpp` 中 `lk::Runtime` | `EnableMediaWithDefaults(deps)` + `CreateModularPeerConnectionFactory`；默认 codec factories | 注入自定义 factories，抽出 RTC runtime 与 codec host |
+| `livekit-sdk-cpp/src/engines/rtc/room.cpp` 中 `lk::Runtime` | `EnableMediaWithDefaults(deps)` + `CreateModularPeerConnectionFactory`；默认 codec factories | 注入自定义 factories，抽出 RTC runtime 与 codec host |
 | `src/internal/lk/media.hpp`、`src/media.cpp` | `VideoSource`、`MediaPump`、`TrackSink`；文件输入、回调、录制与输出存在耦合 | 拆源适配、订阅出口、渲染及录制分支 |
 | `src/media_graph/playback_graph.*` | 固定单个 FFmpeg 复合节点，Player 线程串行访问 | 抽取通用图支持，增加 RTC graph 与后端驱动节点 |
 | `src/media_graph/channel.hpp` | 有界队列、满时拒绝、按时间和 generation 取帧；调用者负责串行化 | 保留播放器语义，增加 RTC 跨线程有界通道，禁止直接并发复用 |

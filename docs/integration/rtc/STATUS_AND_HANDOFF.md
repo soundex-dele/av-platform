@@ -1,6 +1,6 @@
 # RTC 系统功能现状与暂停交接
 
-> 2026-10-26 归档快照，来源：[livekit-cpp/docs/STATUS_AND_HANDOFF.md](../../livekit-cpp/docs/STATUS_AND_HANDOFF.md)（提交 `da4732d`）。正文中的工作区路径和验证状态保留原始记录；本次仅归档文档，未迁移测试产物或重新验收。
+> 2026-10-26 归档快照，来源：[livekit-cpp/docs/STATUS_AND_HANDOFF.md](../../../livekit-cpp/docs/STATUS_AND_HANDOFF.md)（提交 `da4732d`）。正文中的工作区路径和验证状态保留原始记录；本次仅归档文档，未迁移测试产物或重新验收。
 
 更新日期：2026-10-26（Asia/Shanghai）。范围：`D:\workspace\livekit-cpp` 服务端、
 `D:\workspace\livekit-sdk-cpp` SDK，以及 `D:\workspace\webrtc` 原生依赖。
@@ -59,7 +59,7 @@ SFU 集成测试对服务端视频 Encode/Decode 调用数检查为零。
 | 服务端 API 客户端 | Room/Egress/Ingress/SIP/AgentDispatch/Connector 六类、49 个 RPC 的客户端与协议测试 | 后五类客户端存在不代表本 C++ 服务端实现了对应后端；既有真实 API 联调主要是 Room |
 
 SDK 自身与官方 LiveKit Server 1.13.10 的历史验证见
-[SDK VALIDATION](../../livekit-sdk-cpp/VALIDATION.md)。这部分通过不能替代与本项目
+[SDK VALIDATION](../../../livekit-sdk-cpp/VALIDATION.md)。这部分通过不能替代与本项目
 C++ 服务端的最新集成验证。SDK Linux、Android、iOS 不在当前已验收平台内。
 
 ## 4. 最新验证快照及未关闭问题
@@ -125,7 +125,7 @@ C++ 服务端的最新集成验证。SDK Linux、Android、iOS 不在当前已�
 - RTP/RTCP、NACK/RTX、PLI/FIR、FEC、拥塞控制、pacing、分包/组帧继续复用
   libwebrtc；应用层负责路由、权限、订阅策略和协商映射。未接入能力也按此原则扩展。
 - 原生基线是 M137 `aad183504be13d5a9c529581a27c53767570b5d6`，附带明确的
-  [pacer 暂停/TTL 补丁](../../livekit-cpp/patches/README.md)。当前原生工作树仅修改
+  [pacer 暂停/TTL 补丁](../../../livekit-cpp/patches/README.md)。当前原生工作树仅修改
   `modules/pacing/prioritized_packet_queue.cc`。历史文档“WebRTC 未修改”只适用于历史增量。
 - 补丁修复累计暂停造成新包被误判过期的问题；真实 TTL 与平均排队统计语义保留。
   升级需复核补丁；不得通过延长 TTL 或移除回归绕开问题。
@@ -179,7 +179,7 @@ WSL 当前验证快照为 `/root/livekit-validation-20261023-2038/`，服务端�
 `tests/sdk_cli_integration.py`、`tests/sdk_cli_stream_integration.py`；
 `tests/linux_wsl_integration.py`。浏览器、TURN 和网络故障命令见
 [NETWORK_VALIDATION.md](NETWORK_VALIDATION.md)，依赖及构建见
-[README](../../livekit-cpp/README.md)、[补丁说明](../../livekit-cpp/patches/README.md)。
+[README](../../../livekit-cpp/README.md)、[补丁说明](../../../livekit-cpp/patches/README.md)。
 
 ## 8. 暂停记录
 

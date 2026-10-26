@@ -6,15 +6,18 @@
 
 ## 架构文档
 
-- [远程协助实现与运行](docs/remote-control/README.md)：浏览器控制 Windows、ImGui 被控端、Go + SQLite 授权服务及无桌面操作的跨仓库验证。
+- [目录结构与多业务边界](docs/architecture/repository-layout.md)：客户端按 APP/端组织，业务服务按领域组织，包含重构后的构建与 API 入口。
+- [目录重构验证](docs/integration/layout-refactor/VALIDATION.md)：构建矩阵、模块测试、路由隔离与无桌面操作的远控端到端结果。
 
-- [平台总体设计](docs/platform-design.md)：仓库职责、跨仓库契约、关键流程、部署和实施阶段。
+- [远程协助实现与运行](docs/integration/remote-control/README.md)：浏览器控制 Windows、ImGui 被控端、Go + SQLite 授权服务及无桌面操作的跨仓库验证。
+
+- [平台总体设计](docs/architecture/platform-design.md)：仓库职责、跨仓库契约、关键流程、部署和实施阶段。
 - 各仓库设计：[客户端](livekit-app/docs/design.md)、[业务服务](livekit-server/docs/design.md)、[SDK](livekit-sdk-cpp/docs/design.md)、[媒体服务](livekit-cpp/docs/design.md)、[GraphFlow](graphflow-cpp/docs/design.md)、[WebRTC](webrtc/docs/av-platform-design.md)。
 
-- [RTC 功能现状与暂停交接](docs/rtc/STATUS_AND_HANDOFF.md)：已实现功能、未完成能力、已知失败、提交记录与恢复入口。
-- [RTC 实施规划](docs/rtc/IMPLEMENTATION.md)与[验证记录](docs/rtc/VALIDATION.md)：保留原验收范围和实际测试结果。
+- [RTC 功能现状与暂停交接](docs/integration/rtc/STATUS_AND_HANDOFF.md)：已实现功能、未完成能力、已知失败、提交记录与恢复入口。
+- [RTC 实施规划](docs/integration/rtc/IMPLEMENTATION.md)与[验证记录](docs/integration/rtc/VALIDATION.md)：保留原验收范围和实际测试结果。
 
-- [SDK 架构设计](docs/sdk-architecture.md)：公共 API、场景引擎、媒体图运行时、媒体节点、线程与生命周期、模块集成和实施顺序。
+- [SDK 架构设计](docs/architecture/sdk-architecture.md)：公共 API、场景引擎、媒体图运行时、媒体节点、线程与生命周期、模块集成和实施顺序。
 
 ## 子模块
 

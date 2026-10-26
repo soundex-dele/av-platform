@@ -1,6 +1,6 @@
 # coturn 会话凭证
 
-> 2026-10-26 归档快照，来源：[livekit-cpp/docs/TURN.md](../../livekit-cpp/docs/TURN.md)（提交 `da4732d`）。正文中的工作区路径和验证状态保留原始记录；本次仅归档文档，未迁移测试产物或重新验收。
+> 2026-10-26 归档快照，来源：[livekit-cpp/docs/TURN.md](../../../livekit-cpp/docs/TURN.md)（提交 `da4732d`）。正文中的工作区路径和验证状态保留原始记录；本次仅归档文档，未迁移测试产物或重新验收。
 
 服务端可为每次认证入房签发 coturn REST 凭证。ICE、TURN 连接、DTLS/SRTP 和
 媒体传输由 libwebrtc 处理；应用仅生成 coturn 规定的用户名及认证密码。
@@ -8,7 +8,7 @@
 
 ## 服务端配置
 
-参考 [config.turn.example.json](../../livekit-cpp/config.turn.example.json)：
+参考 [config.turn.example.json](../../../livekit-cpp/config/config.turn.example.json)：
 
 ```json
 {

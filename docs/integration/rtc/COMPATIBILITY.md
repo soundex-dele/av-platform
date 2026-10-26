@@ -1,6 +1,6 @@
 # 兼容性与依赖基线
 
-> 2026-10-26 归档快照，来源：[livekit-cpp/docs/COMPATIBILITY.md](../../livekit-cpp/docs/COMPATIBILITY.md)（提交 `da4732d`）。正文中的工作区路径和验证状态保留原始记录；本次仅归档文档，未迁移测试产物或重新验收。
+> 2026-10-26 归档快照，来源：[livekit-cpp/docs/COMPATIBILITY.md](../../../livekit-cpp/docs/COMPATIBILITY.md)（提交 `da4732d`）。正文中的工作区路径和验证状态保留原始记录；本次仅归档文档，未迁移测试产物或重新验收。
 
 截至 2026-10-26。这里区分已经实测的组合和仍在实施的目标；完整验收范围见
 [IMPLEMENTATION.md](IMPLEMENTATION.md)，运行证据见 [VALIDATION.md](VALIDATION.md)。
@@ -9,7 +9,7 @@
 
 | 组件 | 当前基线 | 约束 |
 | --- | --- | --- |
-| 原生 WebRTC | M137，提交 `aad183504be13d5a9c529581a27c53767570b5d6` + 本地 pacer TTL 补丁 | 见 [补丁说明](../../livekit-cpp/patches/README.md)；需重建原生库并运行 native-send；升级需重新验证 |
+| 原生 WebRTC | M137，提交 `aad183504be13d5a9c529581a27c53767570b5d6` + 本地 pacer TTL 补丁 | 见 [补丁说明](../../../livekit-cpp/patches/README.md)；需重建原生库并运行 native-send；升级需重新验证 |
 | LiveKit protocol | `f09f87aab29b865850a967924726bf76b7db4755` | Linux 引导脚本按完整提交获取并核对已有仓库 |
 | Protobuf | 21.12，`f0dc78d7e6e331b8c6bb2d5283e06aa26883ca7c` | 生成器与静态库同源构建 |
 | 官方 Web SDK | `livekit-client` 2.15.6 | 浏览器媒体集成测试使用该固定版本 |

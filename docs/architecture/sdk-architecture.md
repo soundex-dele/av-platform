@@ -4,7 +4,7 @@
 
 本文记录当前讨论确定的架构方向。除“现有模块”部分明确列出的能力外，模块名、接口名和执行策略均为设计目标，示意代码不代表已有可调用 API。
 
-平台职责和跨仓库接口见 [总体设计](platform-design.md)，SDK 当前源码结构和迁移步骤见 [SDK 仓库设计](../livekit-sdk-cpp/docs/design.md)。当前媒体状态以 [RTC 交接快照](rtc/STATUS_AND_HANDOFF.md)为准，本次文档更新未重新执行测试。
+平台职责和跨仓库接口见 [总体设计](platform-design.md)，SDK 当前源码结构和迁移步骤见 [SDK 仓库设计](../../livekit-sdk-cpp/docs/design.md)。当前媒体状态以 [RTC 交接快照](../integration/rtc/STATUS_AND_HANDOFF.md)为准，本次文档更新未重新执行测试。
 
 ## 1. 目标与范围
 
@@ -304,13 +304,13 @@ FFmpeg 计划用于解封装、编解码、滤镜和重采样等后端能力；�
 
 源码依据：
 
-- [GraphFlow README](../graphflow-cpp/README.md)
-- [GraphEngine](../graphflow-cpp/engine/graph_engine.h)
-- [GraphNode](../graphflow-cpp/core/graph_node.h)
-- [EventBus](../graphflow-cpp/core/event_bus.h)
-- [音视频模拟示例](../graphflow-cpp/examples/av_pipeline/main.cpp)
-- [LiveKit C++ SDK README](../livekit-sdk-cpp/README.md)
-- [媒体服务 README](../livekit-cpp/README.md)
+- [GraphFlow README](../../graphflow-cpp/README.md)
+- [GraphEngine](../../graphflow-cpp/engine/graph_engine.h)
+- [GraphNode](../../graphflow-cpp/core/graph_node.h)
+- [EventBus](../../graphflow-cpp/core/event_bus.h)
+- [音视频模拟示例](../../graphflow-cpp/examples/av_pipeline/main.cpp)
+- [LiveKit C++ SDK README](../../livekit-sdk-cpp/README.md)
+- [媒体服务 README](../../livekit-cpp/README.md)
 - [FFmpeg 官方能力说明](https://ffmpeg.org/about.html)
 
 ## 13. 实施顺序与验证目标

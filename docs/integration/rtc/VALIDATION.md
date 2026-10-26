@@ -1,6 +1,6 @@
 # 验证记录
 
-> 2026-10-26 归档快照，来源：[livekit-cpp/VALIDATION.md](../../livekit-cpp/VALIDATION.md)（提交 `da4732d`）。正文中的工作区路径和验证状态保留原始记录；本次仅归档文档，未迁移测试产物或重新验收。
+> 2026-10-26 归档快照，来源：[livekit-cpp/VALIDATION.md](../../../livekit-cpp/VALIDATION.md)（提交 `da4732d`）。正文中的工作区路径和验证状态保留原始记录；本次仅归档文档，未迁移测试产物或重新验收。
 
 ## 当前增量：原生 pacer 暂停后的 TTL 修复（2026-10-26）
 
@@ -12,7 +12,7 @@ M137 原生队列返回了扣除累计暂停时间的入队时刻，但 TTL 与�
 - 修复前 Windows 失败证据：`out/pacer-pause-before.log`；Linux 同一断言也
   失败。修复在原生 `PrioritizedPacketQueue` 内使用它已保存的原始入队时间，
   没有增加 TTL、强制带宽、放宽媒体断言或重写 pacing。补丁及应用说明见
-  [patches/README.md](../../livekit-cpp/patches/README.md)。相邻 WebRTC 工作树现在包含这份明确
+  [patches/README.md](../../../livekit-cpp/patches/README.md)。相邻 WebRTC 工作树现在包含这份明确
   的本地补丁；此前“未改 WebRTC”的描述仅适用于那些历史增量。
 - 原生回归覆盖空队列暂停、新包不误删、音频优先级、真实 TTL 过期、平均排队
   时间扣除暂停，以及八轮暂停。Windows/Linux 构建后 CTest 均 **4/4 通过**。

@@ -1,6 +1,6 @@
 # Remote-control protocol v1
 
-HTTP 权威契约位于 `livekit-server/api/openapi.json`。媒体使用现有 `/rtc` 双 PeerConnection，不启用 `/rtc/v1`。每个批准会话独享房间 `rc_<id>`，仅签发 `host_<id>` 和 `controller_<id>` 两个身份。
+HTTP 权威契约位于 `livekit-server/api/remote-control/openapi.json`。媒体使用现有 `/rtc` 双 PeerConnection，不启用 `/rtc/v1`。每个批准会话独享房间 `rc_<id>`，仅签发 `host_<id>` 和 `controller_<id>` 两个身份。
 
 ## 数据通道
 
