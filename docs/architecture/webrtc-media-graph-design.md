@@ -1,4 +1,4 @@
-> 2026-10-26 更新：采集、视频编码、解码、渲染和录制已拆为独立节点，通过 GraphEngine::loadFromNodes 和强类型事件边创建实际媒体图。视频发送采用图侧真实编码 + 标准 Custom VideoTrackSource/native buffer + EncoderFactory 透传适配，不修改 WebRTC 源码。WebRTC 仍调度透传触发帧；音频编解码保留原生调度。当前实现和边界见 [实现说明](../../livekit-sdk-cpp/docs/media-graph-webrtc.md)。
+> 2026-10-26 更新：采集、视频编码、解码、渲染和录制已拆为独立节点，通过 GraphEngine::loadFromNodes 和强类型事件边创建实际媒体图。视频发送采用图侧真实编码 + 标准 Custom VideoTrackSource/native buffer + EncoderFactory 透传适配，不修改 WebRTC 源码。WebRTC 仍调度透传触发帧；音频编解码保留原生调度。视频接收通过自定义 DecoderFactory 在 Decode 入口送入每轨完整接收图，解码像素不回交 WebRTC；呈现由图负责，原生解码后统计和音画同步反馈不再自动保留。当前实现和边界见 [实现说明](../../livekit-sdk-cpp/docs/media-graph-webrtc.md)。
 
 # WebRTC 节点化接入 Media Graph 方案
 
@@ -14,11 +14,11 @@
 
 - 采集、编码、解码、渲染分别拥有配置、状态、资源和指标，可单独替换与复用。
 - 自定义 Factory 返回 WebRTC 接口适配器；适配器把真正的编解码交给 Media Graph 中的 codec 节点执行。
-- WebRTC 继续负责 SDP/ICE/DTLS/SRTP、RTP/RTCP、拥塞控制、码率分配、pacing、接收组帧、抖动缓冲、NetEq 和 RTC 播放时序。
+- WebRTC 继续负责 SDP/ICE/DTLS/SRTP、RTP/RTCP、拥塞控制、码率分配、pacing、接收组帧、抖动缓冲、视频解码前调度、NetEq 和音频播放；视频解码后的呈现由媒体图接管。
 - GraphFlow 承担图组织与控制；逐帧数据和高频码控走专用媒体连接及 codec 调用接口。
 - 普通 RTC 发布仍从原始帧进入 WebRTC，由 WebRTC 在合适时机调用编码节点。第一版不提供任意预编码包直接注入 PeerConnection 的能力。
 
-这细化了原架构中“WebRTC 编解码保留在 RTC 后端”的描述：编解码操作成为独立媒体节点，但 RTC 场景下的调用时机及网络控制权仍归 WebRTC。不会建立第二套编码、解码或播放调度链路。
+这细化了原架构中“WebRTC 编解码保留在 RTC 后端”的描述：编解码操作成为独立媒体节点，但 RTC 场景下的调用时机及网络控制权仍归 WebRTC。视频接收只保留图内呈现出口，不同时运行 WebRTC 原生视频播放出口。
 
 ## 2. 当前源码与需要补齐的部分
 
@@ -48,7 +48,9 @@
 | `VideoDecoderNode` | EncodedVideoFrame + DecodeControl → VideoFrame | 独立解码实例；RTC 下由解码器适配器驱动 |
 | `AudioEncoderNode` / `AudioDecoderNode` | PCM ↔ 编码音频 | 同步 codec 操作；保留 Opus/NetEq 所需语义 |
 | `RtcPublishNode` | 原始音视频 → 本地轨道 | 轨道源适配、发布控制、源适应；无独立编码实现 |
-| `RtcSubscribeNode` | 远端轨道 → 已进入 WebRTC 输出阶段的帧 | 订阅控制、track sink/音频出口适配；无第二次解码 |
+| `RtcEncodedSourceNode` | DecoderAdapter → 待解码请求 | 按已注册的接收 SSRC 路由，保留目标呈现时间 |
+| `RtcSubscribeNode` | 远端音频轨道 → PCM | 音频 sink/录制出口；视频已改走编码帧入口 |
+| `VideoPresentNode` | 解码帧 → 到期画面 | 本地时钟、有界队列、迟到丢帧；实际音频主时钟待接入 |
 | `VideoRenderNode` | VideoFrame → RenderTarget | 应用渲染线程执行；支持预览与远端输出 |
 | `AudioOutputNode` | PCM/播放拉取 → 设备 | 与 ADM/共享音频服务协调，处理实际输出与设备时钟 |
 
@@ -81,14 +83,15 @@ CameraCapture / ScreenCapture
 ```text
 网络 → WebRTC SRTP / RTP / 重排组帧 / 抖动缓冲 / 解码调度
                          ↓ VideoDecoderAdapter::Decode
+                    RtcEncodedSourceNode
+                         ↓
                     VideoDecoderNode → CodecBackend
-                         ↓ DecodedImageCallback
-                    WebRTC 接收输出时序 / A-V 同步
-                         ↓ VideoTrack Sink
-                    RtcSubscribe → MediaChannel → VideoRender
+                         ↓ 内部解码回调，像素留在图内
+                    VideoPresentNode → VideoRender
+                    解码输出另分流到 RecordingNode
 ```
 
-解码结果必须回交 WebRTC。正常播放出口从 track sink 获取，不能直接将 decoder callback 接到 renderer，否则会绕过 WebRTC 接收输出时序。可增加解码结果观测分支，但不能用它替代主播放链路。
+按当前确定的边界，解码后的像素不回交 WebRTC。自定义 DecoderFactory 返回入口适配器，Decode 通过同步图事件调用真实 codec，并把真实返回码交回 WebRTC；无需修改 WebRTC 源码。解码输出进入同一张接收图的呈现/渲染/录制节点。目标呈现时间随请求保留，呈现队列有界。原生解码耗时估计、解码后统计和音画同步反馈不会自动保留；当前没有接入音频设备主时钟，完整同步仍是待实现能力。
 
 ### 4.3 音频
 
@@ -124,7 +127,8 @@ GraphVideoEncoderFactory::Create(env, format)
     → 返回 GraphVideoEncoderAdapter，持有节点执行租约
 
 WebRTC → Adapter → Node → Backend
-WebRTC ← Adapter ← Node ← Backend callback
+编码输出：WebRTC ← Adapter ← Node ← Backend callback
+视频解码输出：Backend callback → Node → Present → Render / Recording
 ```
 
 初版 Backend 包装 `CreateBuiltinVideoEncoderFactory()` / `CreateBuiltinVideoDecoderFactory()` 创建的 codec，随后可替换系统硬件或 FFmpeg 实现。后台 factory 必须是独立 delegate，不能调用外层 Graph factory，避免递归创建。
@@ -167,7 +171,7 @@ factory = webrtc::CreateModularPeerConnectionFactory(std::move(deps));
 | `RegisterEncodeCompleteCallback` | 管理回调租约；完整转发 EncodedImage、CodecSpecificInfo、返回值及丢帧通知 |
 | `GetEncoderInfo` | 返回真实 alignment、native handle、simulcast、硬件加速等能力 |
 | Decoder `Configure` / `Decode` | 转发配置、编码帧与 render time；返回解码状态 |
-| `RegisterDecodeCompleteCallback` | 回交帧、decode time、QP 与必要时间信息 |
+| `RegisterDecodeCompleteCallback` | 仅控制内部 codec 回调启停；解码像素进入图，不调用 WebRTC 注册的回调 |
 | `Release` | 在所属执行序列关闭当前 codec 会话并等待其回调静默；允许后续重新初始化 |
 
 `SetRates` 等高频命令与 Encode 必须有明确的先后顺序，不能交给无序 EventBus；图配置只提供上限/偏好，最终 RTC 实时目标由 WebRTC 决定。关键帧请求通过 WebRTC 传入的 `frame_types` 到达节点。
@@ -181,6 +185,8 @@ factory = webrtc::CreateModularPeerConnectionFactory(std::move(deps));
 ## 6. 图内实例、轨道关联与调度
 
 ### 6.1 解决 Factory 没有 track ID 的限制
+
+视频接收当前实现：OnTrack 从接收器参数登记 SSRC → 接收图；Factory 适配器在 Decode 读取 PacketInfos 的 SSRC 路由，未知或冲突值拒绝。每轨 GraphEngine 统一拥有编码帧入口、解码、呈现、渲染与可选录制节点；codec 的 Configure/Release 仍由适配器管理，不在图停止线程调用原生 codec Release。以下 Host 描述保留为进一步通用化设计。
 
 当前视频 `Create(env, format)` 没有 MID、SSRC、track ID，音频 codec pair ID 也不是业务 track ID。因此不按 codec 名、创建顺序或线程局部变量猜测归属。
 
