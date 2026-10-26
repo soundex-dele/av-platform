@@ -10,3 +10,9 @@
 [submodule "webrtc"]
 	path = webrtc
 	url = https://github.com/soundex-dele/webrtc.git
+[submodule "livekit-app"]
+	path = livekit-app
+	url = https://github.com/soundex-dele/livekit-app.git
+[submodule "livekit-server"]
+	path = livekit-server
+	url = https://github.com/soundex-dele/livekit-server.git

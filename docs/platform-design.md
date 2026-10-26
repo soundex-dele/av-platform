@@ -17,14 +17,14 @@
 | 仓库 | 职责 | 当前基线 | 设计入口 |
 | --- | --- | --- | --- |
 | `av-platform` | 总体契约、集成文档、固定依赖版本 | 聚合仓库，无统一产品构建 | 本文 |
-| `livekit-app` | 产品 UI、交互、系统授权引导 | 仅初始化本地仓库 | [客户端设计](../livekit-app/docs/design.md) |
-| `livekit-server` | 账号、项目、设备、业务权限、Token、任务与资产 | 仅初始化本地仓库 | [业务服务设计](../livekit-server/docs/design.md) |
+| `livekit-app` | 产品 UI、交互、系统授权引导 | `f911afa`，ImGui 远控被控端与浏览器控制端 | [客户端设计](../livekit-app/docs/design.md) |
+| `livekit-server` | 账号、项目、设备、业务权限、Token、任务与资产 | `97c2c40`，Go + SQLite 远控授权服务 | [业务服务设计](../livekit-server/docs/design.md) |
 | `livekit-sdk-cpp` | 原生 SDK、场景引擎与媒体运行时的演进载体 | `2cfd118`，现有 C++20 RTC SDK | [SDK 仓库设计](../livekit-sdk-cpp/docs/design.md) |
 | `livekit-cpp` | RTC 信令、RoomService、SFU、未来媒体 worker | `da4732d`，C++20 单机兼容服务 | [媒体服务设计](../livekit-cpp/docs/design.md) |
 | `graphflow-cpp` | 通用图、生命周期、控制事件 | `4b0c881`，C++17 Core/Engine | [GraphFlow 设计](../graphflow-cpp/docs/design.md) |
 | `webrtc` | 原生 RTC 协议、编解码、拥塞控制、设备基础 | `40200b3d88`，M137 衍生版本 | [WebRTC 集成设计](../webrtc/docs/av-platform-design.md) |
 
-以上提交号为本次设计读取的本地 HEAD，不是新增发布版本。`graphflow-cpp`、`livekit-sdk-cpp`、`livekit-cpp`、`webrtc` 已在 `.gitmodules` 登记；`livekit-app`、`livekit-server` 目前是同目录下独立的本地 Git 仓库，尚无远程仓库和子模块登记。递归克隆聚合仓库不会取得这两个新仓库。
+以上提交号为文档记录的基线，不是新增发布版本；实际固定版本以主仓库的 gitlink 为准。`graphflow-cpp`、`livekit-sdk-cpp`、`livekit-cpp`、`webrtc`、`livekit-app`、`livekit-server` 均已在 `.gitmodules` 登记，递归克隆聚合仓库会取得这些子模块。
 
 `graphflow-cpp/utoolkit` 属于 GraphFlow 的传递依赖，其他 vendored 第三方库也由直接使用方管理；本次不重写其上游设计。
 

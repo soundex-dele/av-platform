@@ -24,17 +24,12 @@
 | `livekit-sdk-cpp` | 现有原生 C++ RTC SDK，作为首个 RTC 后端的基础 | [livekit-sdk-cpp](https://github.com/soundex-dele/livekit-sdk-cpp) |
 | `livekit-cpp` | 现有 C++ 媒体服务，用于联调及后续服务端演进 | [livekit-cpp](https://github.com/soundex-dele/livekit-cpp) |
 | `webrtc` | 原生 WebRTC 及其 CMake 工程 | [webrtc](https://github.com/soundex-dele/webrtc) |
+| `livekit-app` | 客户端应用：ImGui 远控被控端与浏览器控制端 | [livekit-app](https://github.com/soundex-dele/livekit-app) |
+| `livekit-server` | 业务服务：Go + SQLite 远控授权服务 | [livekit-server](https://github.com/soundex-dele/livekit-server) |
 
 保留上述同级目录布局，以兼容现有模块对相邻 WebRTC 源码目录的引用。各模块的构建要求和验证范围以模块自己的 README 为准；聚合仓库暂不提供统一构建入口。
 
-## 新建本地仓库
-
-| 路径 | 定位 | 状态 |
-| --- | --- | --- |
-| `livekit-app` | 客户端应用：交互、页面、系统授权引导 | 独立本地 Git 仓库；已实现 ImGui 远控被控端与浏览器控制端 |
-| `livekit-server` | 业务服务：账号、会议与远控授权、Token、任务和资产 | 独立本地 Git 仓库；已实现 Go + SQLite 远控授权服务 |
-
-这两个仓库尚未创建远程或登记为子模块，递归克隆不会包含它们。本地设计文档已分别放在各自仓库中。业务仓库 `livekit-server` 与 `livekit-cpp` 当前同名媒体可执行文件的区别见总体设计。
+业务仓库 `livekit-server` 与 `livekit-cpp` 当前同名媒体可执行文件的区别见总体设计。
 
 ## 获取代码
 

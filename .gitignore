@@ -1,6 +1,3 @@
 .DS_Store
 /build/
 /out/
-# Independent local repositories; committed separately (see README).
-/livekit-app/
-/livekit-server/
