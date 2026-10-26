@@ -10,6 +10,7 @@
 - [目录重构验证](docs/integration/layout-refactor/VALIDATION.md)：构建矩阵、模块测试、路由隔离与无桌面操作的远控端到端结果。
 
 - [远程协助实现与运行](docs/integration/remote-control/README.md)：浏览器控制 Windows、ImGui 被控端、Go + SQLite 授权服务及无桌面操作的跨仓库验证。
+- [传屏首版实施方案](docs/integration/screen-cast/IMPLEMENTATION.md)：Windows 向浏览器一对一传屏的已确认范围、实现规划与验收要求，尚未实施。
 
 - [平台总体设计](docs/architecture/platform-design.md)：仓库职责、跨仓库契约、关键流程、部署和实施阶段。
 - 各仓库设计：[客户端](livekit-app/docs/design.md)、[业务服务](livekit-server/docs/design.md)、[SDK](livekit-sdk-cpp/docs/design.md)、[媒体服务](livekit-cpp/docs/design.md)、[GraphFlow](graphflow-cpp/docs/design.md)、[WebRTC](webrtc/docs/av-platform-design.md)。
