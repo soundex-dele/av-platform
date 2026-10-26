@@ -1,0 +1,12 @@
+{
+  "description": "Cross-language protocol examples; these are fixtures, not credentials.",
+  "grant": {"grant_id":"example", "controller_identity":"controller_example", "epoch":1},
+  "layout": {"v":1,"type":"layout","grant_id":"example","epoch":1,"layout_version":1,"width":1920,"height":1080,"active":true},
+  "controller_messages": [
+    {"v":1,"type":"heartbeat","grant_id":"example","epoch":1,"seq":1},
+    {"v":1,"type":"layout_ack","grant_id":"example","epoch":1,"seq":2,"layout_version":1},
+    {"v":1,"type":"move","grant_id":"example","epoch":1,"seq":3,"layout_version":1,"x":0.5,"y":0.5},
+    {"v":1,"type":"key","grant_id":"example","epoch":1,"seq":4,"layout_version":1,"code":"KeyA","down":true},
+    {"v":1,"type":"release","grant_id":"example","epoch":1,"seq":5}
+  ]
+}

@@ -6,6 +6,14 @@
 
 ## 架构文档
 
+- [远程协助实现与运行](docs/remote-control/README.md)：浏览器控制 Windows、ImGui 被控端、Go + SQLite 授权服务及无桌面操作的跨仓库验证。
+
+- [平台总体设计](docs/platform-design.md)：仓库职责、跨仓库契约、关键流程、部署和实施阶段。
+- 各仓库设计：[客户端](livekit-app/docs/design.md)、[业务服务](livekit-server/docs/design.md)、[SDK](livekit-sdk-cpp/docs/design.md)、[媒体服务](livekit-cpp/docs/design.md)、[GraphFlow](graphflow-cpp/docs/design.md)、[WebRTC](webrtc/docs/av-platform-design.md)。
+
+- [RTC 功能现状与暂停交接](docs/rtc/STATUS_AND_HANDOFF.md)：已实现功能、未完成能力、已知失败、提交记录与恢复入口。
+- [RTC 实施规划](docs/rtc/IMPLEMENTATION.md)与[验证记录](docs/rtc/VALIDATION.md)：保留原验收范围和实际测试结果。
+
 - [SDK 架构设计](docs/sdk-architecture.md)：公共 API、场景引擎、媒体图运行时、媒体节点、线程与生命周期、模块集成和实施顺序。
 
 ## 子模块
@@ -18,6 +26,15 @@
 | `webrtc` | 原生 WebRTC 及其 CMake 工程 | [webrtc](https://github.com/soundex-dele/webrtc) |
 
 保留上述同级目录布局，以兼容现有模块对相邻 WebRTC 源码目录的引用。各模块的构建要求和验证范围以模块自己的 README 为准；聚合仓库暂不提供统一构建入口。
+
+## 新建本地仓库
+
+| 路径 | 定位 | 状态 |
+| --- | --- | --- |
+| `livekit-app` | 客户端应用：交互、页面、系统授权引导 | 独立本地 Git 仓库；已实现 ImGui 远控被控端与浏览器控制端 |
+| `livekit-server` | 业务服务：账号、会议与远控授权、Token、任务和资产 | 独立本地 Git 仓库；已实现 Go + SQLite 远控授权服务 |
+
+这两个仓库尚未创建远程或登记为子模块，递归克隆不会包含它们。本地设计文档已分别放在各自仓库中。业务仓库 `livekit-server` 与 `livekit-cpp` 当前同名媒体可执行文件的区别见总体设计。
 
 ## 获取代码
 
