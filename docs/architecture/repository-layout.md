@@ -25,6 +25,10 @@ livekit-app/
       services/             业务 API 请求
       features/remote_control/  控制界面和数据协议
     web/tests/
+  apps/conference/desktop/  会议窗口、会话、渲染测试与 macOS 打包
+  apps/player/desktop/      本地播放器窗口、会话与无窗口测试
+  packages/native/          跨产品 ImGui 包
+  cmake/NativeSDK.cmake      按产品选择 SDK 引擎
 ```
 
 新产品使用 `apps/screen-cast/<端>` 等目录，与远控产品并列。每个 APP 的端拥有自己的入口、构建、配置和产物；控制/被控、发送/接收属于业务角色，有独立安装包需求时才拆入口。
@@ -68,7 +72,7 @@ livekit-server/
 
 `src/server_sdk` 和 `LiveKit::ServerSDK` 提供服务管理与 Token 能力，可独立于 RTC/Player 构建。RTC 当前仍复用其中的认证工具。`src/support` 放网络与进程辅助；私有头与实现共置，不再使用 `src/internal/lk`。
 
-示例集中在 `examples/{room_client,conference_viewer,local_player,web_viewer}`，CLI 位于 `tools/cli`。Player 构建入口位于 `src/engines/player/CMakeLists.txt`。
+SDK 示例保留 `examples/{room_client,web_viewer}`，CLI 位于 `tools/cli`。会议与播放器界面、应用测试、打包入口迁至 `livekit-app/apps/{conference,player}/desktop`；播放器 Windows 构建脚本位于 `livekit-app/scripts`。SDK Player 引擎和底层测试继续位于 SDK，构建入口为 `src/engines/player/CMakeLists.txt`。
 
 独立服务管理构建：`LIVEKIT_BUILD_RTC=OFF`、`LIVEKIT_BUILD_PLAYER=OFF`、`LIVEKIT_BUILD_SERVER_SDK=ON`。
 Windows 产品可用 `WEBRTC_PREBUILT_DIR` 复用同一源码、工具链、架构和静态 CRT 的 Release WebRTC 产物；该模式只生成 Release 配置，不支持混用 Debug。
