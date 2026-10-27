@@ -1,6 +1,6 @@
 # C++ SDK 客户端能力补齐方案
 
-日期：2026-10-27。状态：分阶段实施中；P0/P1、P2 音视频 pull 输出及首版应用 I420/PCM 输入已有部分交付，其余范围仍有效。具体完成项和自动化证据见 [客户端补齐实施记录](../../livekit-sdk-cpp/docs/client-parity-progress.md)，不以本方案内容代表能力已实现。
+日期：2026-10-27。状态：分阶段实施中；连接恢复及首次信令 failover、PCM/I420/RGBA 输入与 pull 输出、订阅权限/接收质量、DTMF/转写、RPC 和初版公共能力查询已有增量交付。C++↔Go 单声道 PCM、官方数据消息和双向 RPC（含无媒体纯数据场景）已完成本机互通验证，其余范围仍有效。具体完成项和自动化证据见 [客户端补齐实施记录](../../livekit-sdk-cpp/docs/client-parity-progress.md)，不以本方案内容代表能力已实现。
 
 基线：当前 `livekit-sdk-cpp` 工作树；Go 对照为 `D:/workspace/server-sdk-go`，版本 2.19.0，提交 `743ab2d6b12ff24c2b2f9a0cc208c7afe8602571`，protocol v1.53.0。
 
@@ -17,7 +17,7 @@ SVC、GPU 零拷贝、硬件 codec 全覆盖属于额外增强，不作为本地
 ## 2. 当前关键约束
 
 - 设计基线曾存在信令 SDK version=0.2.0 与 CMake 0.3.0 不一致；实施中已统一为生成的 0.3.0。默认 protocol 仍为 12；元数据成功确认可显式选择 15，已有官方服务端确认及恢复测试。尚未启用 17，不能仅修改协议数字宣称兼容。
-- `protocol/livekit.proto` 是手写子集，缺少恢复、RPC、stream、DataTrack、加密等消息。
+- `protocol/livekit.proto` 是裁剪子集，恢复及 RPC 等已补入并受上游描述符检查；stream、DataTrack、加密等仍需扩展。
 - `room.cpp` 同时拥有 Peer、发布状态、信令循环和清理；须逐步抽出内部模块，保持每个阶段可独立回归。
 - 现有 RoomState generation 同时承担会话隔离；恢复原会话与重新入会需要不同代次语义。
 - RTC 视频为 I420 值对象，Player 帧为文件时间线上的 RGBA/shared buffer；不能直接把 Player 时间戳当作 RTC 采集时间。
