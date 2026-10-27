@@ -1,4 +1,4 @@
-param([string]$VcpkgRoot = 'D:/vcpkg', [string]$Go = 'go', [switch]$BootstrapMedia)
+param([string]$VcpkgRoot = 'D:/vcpkg', [string]$Go = 'go', [switch]$BootstrapMedia, [string]$QtPrefix = $env:QT_ROOT)
 $ErrorActionPreference = 'Stop'
 $Workspace = Split-Path -Parent (Split-Path -Parent $PSScriptRoot)
 function Checked([scriptblock]$Command) { & $Command; if ($LASTEXITCODE -ne 0) { throw "Build failed ($LASTEXITCODE)" } }
@@ -7,16 +7,20 @@ if (-not (Get-Command $Go -ErrorAction SilentlyContinue)) {
     if (Test-Path -LiteralPath $LocalGo) { $Go = $LocalGo } else { throw 'Install Go 1.25+ or pass -Go /path/to/go.exe' }
 }
 $Sdk = Join-Path $Workspace 'livekit-sdk-cpp'
-$SdkBuild = Join-Path $Sdk 'out/windows-x64'
+if (-not $QtPrefix -or -not (Test-Path "$QtPrefix/lib/cmake/Qt6/Qt6Config.cmake")) { throw 'Pass -QtPrefix with a Qt 6.8+ MSVC x64 shared installation (validated baseline 6.11.1).' }
+$env:PATH = "$QtPrefix/bin;" + $env:PATH
+$SdkBuild = Join-Path $Sdk 'out/windows-x64-md'
+$Crt = 'MultiThreaded$<$<CONFIG:Debug>:Debug>DLL'
+Checked { & "$VcpkgRoot/vcpkg.exe" install openssl libvpx dav1d --triplet x64-windows-static-md }
 $Media = Join-Path $Workspace 'livekit-cpp'
 if ($BootstrapMedia) { Checked { & (Join-Path $Media 'scripts/bootstrap.ps1') -VcpkgRoot $VcpkgRoot } }
-Checked { cmake -S $Sdk -B $SdkBuild -G 'Visual Studio 17 2022' -A x64 "-DCMAKE_TOOLCHAIN_FILE=$VcpkgRoot/scripts/buildsystems/vcpkg.cmake" -DVCPKG_TARGET_TRIPLET=x64-windows-static -DLIVEKIT_BUILD_RTC=ON -DLIVEKIT_BUILD_PLAYER=OFF -DWEBRTC_PREBUILT_DIR= -DLIVEKIT_ENABLE_VIDEO_PLAYOUT=ON -DLIVEKIT_BUILD_TESTS=ON }
+Checked { cmake -S $Sdk -B $SdkBuild -G 'Visual Studio 17 2022' -A x64 "-DCMAKE_TOOLCHAIN_FILE=$VcpkgRoot/scripts/buildsystems/vcpkg.cmake" -DVCPKG_TARGET_TRIPLET=x64-windows-static-md "-DCMAKE_MSVC_RUNTIME_LIBRARY=$Crt" -DLIVEKIT_BUILD_RTC=ON -DLIVEKIT_BUILD_PLAYER=OFF -DWEBRTC_PREBUILT_DIR= -DLIVEKIT_ENABLE_VIDEO_PLAYOUT=OFF -DLIVEKIT_BUILD_TESTS=ON }
 Checked { cmake --build $SdkBuild --config Release --target livekit_remote_control_tests livekit_sdk_tests livekit_media_graph_tests --parallel 4 }
 $App = Join-Path $Workspace 'livekit-app'
 $AppBuild = Join-Path $App 'out/remote-control-desktop'
-Checked { cmake -S (Join-Path $App 'apps/remote-control/desktop') -B $AppBuild -G 'Visual Studio 17 2022' -A x64 "-DCMAKE_TOOLCHAIN_FILE=$VcpkgRoot/scripts/buildsystems/vcpkg.cmake" -DVCPKG_TARGET_TRIPLET=x64-windows-static "-DWEBRTC_PREBUILT_DIR=$SdkBuild" -DBUILD_TESTING=ON }
+Checked { cmake -S (Join-Path $App 'apps/remote-control/desktop') -B $AppBuild -G 'Visual Studio 17 2022' -A x64 "-DCMAKE_TOOLCHAIN_FILE=$VcpkgRoot/scripts/buildsystems/vcpkg.cmake" -DVCPKG_TARGET_TRIPLET=x64-windows-static-md "-DCMAKE_MSVC_RUNTIME_LIBRARY=$Crt" "-DCMAKE_PREFIX_PATH=$QtPrefix" "-DWEBRTC_PREBUILT_DIR=$SdkBuild" -DBUILD_TESTING=ON }
 Checked { cmake --build $AppBuild --config Release --parallel 4 }
-Checked { cmake -S $Media -B "$Media/out/windows-x64" -G 'Visual Studio 17 2022' -A x64 "-DCMAKE_TOOLCHAIN_FILE=$VcpkgRoot/scripts/buildsystems/vcpkg.cmake" -DVCPKG_TARGET_TRIPLET=x64-windows-static "-DWEBRTC_PREBUILT_DIR=$SdkBuild" }
+Checked { cmake -S $Media -B "$Media/out/windows-x64" -G 'Visual Studio 17 2022' -A x64 "-DCMAKE_TOOLCHAIN_FILE=$VcpkgRoot/scripts/buildsystems/vcpkg.cmake" -DVCPKG_TARGET_TRIPLET=x64-windows-static -DWEBRTC_PREBUILT_DIR= }
 Checked { cmake --build "$Media/out/windows-x64" --config Release --parallel 4 }
 Push-Location (Join-Path $Workspace 'livekit-server')
 try { Checked { & $Go test ./... }; Checked { & $Go build -o out/livekit-business-api.exe ./cmd/business-api } } finally { Pop-Location }
@@ -25,5 +29,6 @@ try { Checked { npm ci --no-audit --no-fund }; Checked { npm run build }; Checke
 Checked { ctest --test-dir $SdkBuild -C Release -R '^(remote_control|sdk|media_graph)$' --output-on-failure }
 Checked { ctest --test-dir "$Media/out/windows-x64" -C Release --output-on-failure }
 Checked { ctest --test-dir $AppBuild -C Release --output-on-failure }
-Write-Host "Built ImGui host: $AppBuild/Release/av_remote_host.exe"
+Checked { cmake --install $AppBuild --config Release --prefix "$AppBuild/package" --component RemoteControl }
+Write-Host "Built Qt remote client: $AppBuild/package/bin/av_remote_host.exe"
 Write-Host 'Run scripts/run/remote-control.ps1 to start the services.'

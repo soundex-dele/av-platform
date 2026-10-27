@@ -1,28 +1,65 @@
-# 远程协助 v1
+# Qt6 双平台远程协助
 
-浏览器控制 Windows 主屏，Windows 被控端使用 **ImGui + SDL2**。Go 业务服务管理本地同意后的短期授权；SQLite 持久化状态、清理任务与审计。C++ SDK 执行控制协议和 Windows 输入，C++ SFU 传输 VP8 画面及可靠数据。
+桌面客户端使用 **Qt Widgets + C++ SDK**，同一个应用可以控制其他设备，也可以接受协助。构建目标为 Windows x64 与 macOS 14+，macOS 提供独立 arm64/x86_64 配置；实际验证平台与运行库最低版本见验证记录。浏览器控制端继续兼容；Go 服务管理授权，C++ SFU 传输 VP8 画面和可靠控制消息。
 
-## 构建和启动
+首版面向可信局域网自建服务，每台客户端同时运行一个控制或被控会话，仅共享主屏。不包含账号、无人值守、文件传输、剪贴板同步、音频、多屏切换、远程 IME 或安全桌面控制。
 
-依赖 VS 2022 C++、Windows SDK、CMake、vcpkg 静态依赖、Node 22+、Go 1.25+。沿用 SDK 的 `/MT` 和固定 WebRTC 源码；不复制单独的 SDK `.lib`。首次获取媒体服务依赖时：
+## 使用
+
+1. 在“设置”填写业务服务地址，例如 `http://192.168.1.20:8080`。客户端不配置媒体密钥。
+2. 被控方生成 10 位连接码，5 分钟有效，仅供一次申请；复制后交给协助者。
+3. 协助者填写对方连接码和称呼，点击连接。称呼由协助者填写，未经账号认证。
+4. 被控方本地批准后才开始共享屏幕。macOS 需要屏幕录制与辅助功能权限；“设置”提供权限入口。权限变更后按系统提示重启应用并重新申请。
+5. 在远程窗口点击画面启用键鼠；失焦会释放按键和鼠标，回到画面后重新点击。工具栏支持适应窗口、原始比例、全屏、暂停输入和断开。
+6. 中文、表情和多行内容通过“发送文字”显式发送，每次最多 256 个 Unicode 字符。先点击远程目标输入框，再编辑文字并发送。等待确认期间禁用重复提交；5 秒未确认或断线后不自动重发。确认仅代表输入接口已提交，不保证目标应用收到文字。
+
+被控端最小化后继续连接，托盘/菜单栏标记被控状态并提供停止操作。关闭主窗口、退出应用、关闭控制窗口或点击停止都会结束相应会话。Windows 急停优先使用 Ctrl+Alt+F10，冲突后尝试 Ctrl+Alt+F9；macOS 对应 Control+Option+F10/F9。注册失败会明确提示使用停止按钮或托盘，不影响程序启动。
+
+本地仅保存服务地址、称呼和窗口尺寸，不持久化连接码、授权凭证或文字草稿。断线后必须重新申请，不自动恢复控制权。macOS 显示器断开、旋转或模式变化时停止采集并要求重新连接，以免旧画面与输入坐标失配。
+
+## 构建与打包
+
+Qt 6.8+（本次基线 6.11.1），CMake、C++20、原仓库 WebRTC 依赖。独立目标保留 `av_remote_host` 名称，现在同时提供控制和被控功能。UI 不再依赖 ImGui/SDL；使用 SDK 的 `VideoFrameStream` 在工作线程转换图像，Qt 只显示最新帧。
+
+Windows 使用 VS 2022、Qt MSVC x64 动态版、vcpkg、Go 和 Node：
 
 ```powershell
-.\scripts\build\remote-control.ps1 -BootstrapMedia
-```
-
-设置 `LIVEKIT_API_KEY` 与 `LIVEKIT_API_SECRET`（至少 24 字符），仅供服务进程使用。然后启动：
-
-```powershell
+.\scripts\build\remote-control.ps1 -QtPrefix C:/Qt/6.11.1/msvc2022_64 -BootstrapMedia
 .\scripts\run\remote-control.ps1 -AdvertisedHost 192.168.1.20
 ```
 
-将地址换成部署机器的局域网 IP。脚本在当前终端保持运行，Ctrl+C 清理它启动的两个服务。允许客户端访问业务 HTTP 8080、媒体 HTTP/WebSocket 7880、媒体 UDP 50000–50100；脚本不自动修改防火墙。
+Qt 客户端和它链接的 SDK/WebRTC 使用 `/MD`、`x64-windows-static-md`，SDK 构建目录为 `livekit-sdk-cpp/out/windows-x64-md`。原 SDK `/MT` 默认保留，媒体服务仍使用独立 `/MT` 构建。预编译 WebRTC 导入会校验运行库标记，禁止将旧 `/MT` 库链接进 `/MD` 客户端。便携包输出到 `livekit-app/out/remote-control-desktop/package`。
 
-在被控 Windows 运行 `livekit-app/out/remote-control-desktop/Release/av_remote_host.exe`，填写业务地址并创建连接码。控制者在 Chrome/Edge 打开业务地址下的 `/apps/remote-control/`，输入连接码和称呼。Windows 用户确认请求后才会发布屏幕。点击网页画面启用输入；失焦后需要再次点击。关闭或最小化正在控制的被控窗口会结束控制；也可使用停止按钮或 **Ctrl+Alt+F10**。F10 冲突时尝试 **Ctrl+Alt+F9**，界面显示实际注册的快捷键；两者均不可用时仍可启动，界面提示使用停止按钮或关闭窗口。Windows 为调试器保留 F12，不再使用它注册全局热键。
+macOS 使用现有 Homebrew LLVM 工具链及 Qt、OpenSSL、libvpx、dav1d：
 
-连接码显示在只读文本框中，支持选中后 Ctrl+C，也可点击旁边的“复制”按钮一键复制。连接码 10 位、5 分钟有效，仅供一次申请；拒绝、超时、断线或结束后点击创建按钮生成新码。称呼由申请者自报，不代表经过认证的账号。首版无账号、无人值守、多屏选择、音频、远程剪贴板共享、文件传输、中文 IME 和安全桌面控制。
+```bash
+bash scripts/build/remote-control-macos.sh
+# 只复用架构与工具链匹配的 WebRTC：
+REMOTE_WEBRTC_PREBUILT="$PWD/webrtc/out/macos-x86_64" \
+REMOTE_ARCH=x86_64 bash scripts/build/remote-control-macos.sh
+```
 
-已增加“发送文字”：连接后先点击远程画面中的目标输入框，在网页文字框中输入中文、英文、表情或多行内容，再点击发送。每次最多 256 个 Unicode 字符，不使用剪贴板。等待远端确认时禁用重复发送，成功确认后清空草稿；断线或 5 秒无确认会停止连接，提示先检查远端内容，不自动重发。宿主版本不支持时禁用文字控件。此功能通过 Windows Unicode 输入接口发送文字，不是远程中文 IME，目标应用是否接收仍需观察画面。自动化覆盖和本轮媒体失败见 [验证记录](VALIDATION.md#中文文字发送增量2026-10-27)。
+输出目录为 `livekit-app/out/remote-control-macos-<arch>/package/av_remote_host.app`。arm64 与 x86_64 分别在匹配的编译环境构建。最终包的最低系统版本取源代码目标与打包依赖要求的较高者。分发包会包含 Qt 和本地动态库；本地构建使用 ad-hoc 签名，正式分发的 Developer ID 签名和公证由发布环境提供。
+
+构建脚本会检查所有 Mach-O 依赖、签名，并将应用复制到临时目录执行 offscreen 启动测试，不注册热键、不申请权限、不采集或注入桌面。本机 Homebrew 运行库要求 macOS 15，当前 x86_64 包据此标注为 macOS 15+；生成 14+ 包需要使用最低版本不高于 14 的依赖重新构建。
+
+可通过 `LIVEKIT_PROTOC_EXECUTABLE` 复用已构建的 protoc **3.21.12**；配置阶段验证版本，避免各应用重复编译代码生成工具。
+
+## 自动化验证
+
+```bash
+ctest --test-dir livekit-app/out/remote-control-macos-x86_64 --output-on-failure
+python3 livekit-app/apps/remote-control/desktop/tests/integration.py \
+  --media /absolute/path/livekit-server \
+  --business /absolute/path/business-api \
+  --host /absolute/path/remote_host_fixture \
+  --controller /absolute/path/remote_controller_fixture \
+  --output /absolute/path/test-evidence
+```
+
+桌面 CTest 包括 SDK 消息契约、控制端协议、模拟 macOS 输入边界、取消后迟到响应和 Qt offscreen 截图。原生集成测试运行真实服务、合成 VP8 视频与输入记录器，保留 30 秒至少五帧门槛，覆盖文字确认、会话隔离、释放及业务服务失联。网页测试继续使用原 `npm test`、`npm run test:integration`。
+
+自动化测试不会采集或注入用户桌面，也不调用桌面自动化工具。Windows/macOS 四种控制方向、真实采集、权限弹窗、拖动、DPI、托盘、急停及真实网络中断需另行人工验收。执行结果与未通过项见 [验证记录](VALIDATION.md)。
 
 ## 部署配置
 

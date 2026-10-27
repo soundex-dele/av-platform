@@ -102,3 +102,32 @@ SDK 确定性单测覆盖延迟 5 秒握手、握手前拒绝输入、握手后 
 重新构建媒体服务、远控桌面宿主和 fixture 后，C++ 后端完整六组集成通过：`out/remote-control/2026-10-27T06-13-31-752Z/evidence.json`。覆盖与官方对照相同的六组场景，未降低 30 秒至少 5 个解码帧门槛。失联释放本次记录为心跳中断约 2914 ms、业务中断约 543 ms，不作为延迟 SLA。媒体服务 `native-send`、`native-rtp`、`core` 三组 CTest 通过，远控桌面渲染 1/1 通过。
 
 该结果关闭本轮已复现的视频恢复缺陷，证据限定于记录中的二进制哈希、合成媒体和输入记录器；不代表长期网络稳定性或真实 Windows 输入、显示器和设备已经人工验收。没有使用桌面自动化或真实输入注入。
+
+## Qt6 双角色客户端（2026-10-27，macOS x86_64）
+
+本轮将桌面入口迁移到 Qt Widgets，增加原生控制端、macOS 输入后端、权限引导、托盘与急停入口。ScreenCaptureKit 使用工作区共享的 SDK 主屏采集实现，不引入直播引擎。Windows 保留原工厂并新增 `/MD` 构建路径；本轮实际执行环境为 Intel macOS、Homebrew LLVM、Qt **6.11.1**，不将已有 Windows ImGui 验证记录视为新 Qt Windows 客户端已通过。
+
+| 自动化检查 | 实际结果 |
+| --- | --- |
+| Qt 客户端、SDK、host/controller fixture 编译 | macOS x86_64 Release 通过 |
+| 桌面 CTest | **5/5 通过**：迟到响应/取消、SDK 契约、原生协议与替代输入、普通 DPI 与 2× DPI offscreen 渲染 |
+| Go 业务测试 | `go test ./...` 通过，业务二进制构建通过 |
+| 网页控制端 | 单测 **8/8**、生产构建通过 |
+| 原生控制端 → C++ SFU → SDK fixture | 通过；两个会话在 30 秒内达到至少 5 帧，结束检查时分别为 **13、14 帧**；不同文字标记只到达各自记录器，文字确认、按键释放、主动停止、控制进程终止与业务服务中断均通过 |
+| 网页 → 同一 C++ SFU → 新 SDK fixture | **六组场景通过**；首会话 5 帧、4.5 秒延迟握手会话 10 帧、另一会话 7 帧；未降低门槛 |
+| macOS 应用依赖与启动 | 39 个 Mach-O 文件的非系统依赖全部位于包内，ad-hoc 签名校验通过；复制到临时目录后 offscreen 启动通过 |
+
+本轮原生证据：`livekit-app/out/remote-control-integration/native-20261027-qt6-final/evidence.json`。网页证据：`livekit-app/out/remote-control-integration/web-20261027-qt6/evidence.json`。两者记录了实际二进制 SHA-256；合成视频尺寸为 1280×720，没有读取用户屏幕。网页心跳中断释放单次测量约 3066 ms，业务中断约 524 ms，不作为延迟保证。沿用工作区已有 SFU 视频恢复修复，本轮未修改拥塞控制；上述结果只证明记录中的构建和场景通过。
+
+Qt 程序内截图位于 `livekit-app/out/remote-control-macos-x86_64/remote-host-*.png`、`remote-controller.png` 及 `render-hidpi/`，覆盖首页、等待申请、待批准、被控、结束、权限缺失、错误与控制窗口。检查了中文可读性、授权范围、停止入口、黑边不注入、暂停释放和权限不足禁止批准。macOS 输入测试使用替代 API，覆盖左右修饰键、Retina 坐标、拖动、Unicode 补充平面字符、部分释放失败重试；没有真实 CGEventPost 或 SendInput 注入。
+
+应用包：`livekit-app/out/remote-control-macos-x86_64/package/av_remote_host.app`。打包脚本检查实际运行库版本并写入 Info.plist：**当前包要求 macOS 15+**，因为本机 OpenSSL、PCRE2、zstd 的最低系统版本为 15；源码构建目标仍是 14。没有修改运行库版本标记伪装兼容性。若要交付 macOS 14 包，须使用兼容 14 的依赖重新构建及验证。
+
+最终压缩包为同目录的 `AVRemote-macOS15-x86_64.zip`（约 39 MB，SHA-256：`3ef61b3acc8a21957c83dd7e4834f8958da08ad9b85bcd686aa33b843450f56e`）。最终包包含重新生成连接码及 Shift+Tab 焦点处理改动；应用二进制哈希、主机版本、依赖审计和测试日志保存在 `livekit-app/out/remote-control-integration/qt6-validation/`。
+
+本轮未完成的交付与验收：
+
+- Windows Qt `/MD` 构建、便携包依赖检查以及 macOS arm64 构建尚未在对应环境执行；仓库提供配置与脚本，**不代表已产出这两种包**。
+- macOS 14 运行兼容性未验证，当前本机包不支持该版本。当前 macOS 包为本地 ad-hoc 签名，未做 Developer ID 公证。
+- Windows↔Windows、Windows↔macOS、macOS↔macOS 的真实屏幕采集、主屏/Retina 变化、拖动/组合键、目标应用文字输入、锁屏/注销与权限撤销、权限弹窗、托盘及全局急停仍需实际设备人工验收。
+- 合成媒体测试、替代输入 API 和 offscreen 截图不能替代这些人工验收；全程未使用桌面自动化工具。

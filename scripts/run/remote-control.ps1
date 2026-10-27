@@ -16,7 +16,7 @@ try {
     $BusinessArgs = @('-listen',"0.0.0.0:$HttpPort",'-db',('"'+$RunDirectory+'/state.sqlite"'),'-remote-control-web',('"'+$Workspace+'/livekit-app/apps/remote-control/web/dist"'),'-media-api',"http://127.0.0.1:$MediaPort",'-media-url',"ws://${AdvertisedHost}:$MediaPort")
     $BusinessProcess = Start-Process -FilePath $BusinessBinary -ArgumentList $BusinessArgs -WindowStyle Hidden -PassThru -RedirectStandardOutput "$RunDirectory/business.stdout.log" -RedirectStandardError "$RunDirectory/business.stderr.log"
     Write-Host "Browser URL: http://${AdvertisedHost}:$HttpPort/apps/remote-control/`nHost service URL: http://${AdvertisedHost}:$HttpPort"
-    Write-Host "Open $Workspace/livekit-app/out/remote-control-desktop/Release/av_remote_host.exe on the Windows computer to share."
+    Write-Host "Open $Workspace/livekit-app/out/remote-control-desktop/package/bin/av_remote_host.exe to control or share a desktop."
     Write-Host 'Ctrl+C stops these service processes. Use HTTPS/WSS outside a trusted development LAN.'
     while (-not $MediaProcess.HasExited -and -not $BusinessProcess.HasExited) { Start-Sleep -Seconds 1 }
     throw "Service exited; see $RunDirectory"
