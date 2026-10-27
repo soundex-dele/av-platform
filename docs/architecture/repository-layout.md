@@ -25,9 +25,10 @@ livekit-app/
       services/             业务 API 请求
       features/remote_control/  控制界面和数据协议
     web/tests/
+  apps/screen-cast/          传屏桌面端与 Web 接收端
   apps/conference/desktop/  会议窗口、会话、渲染测试与 macOS 打包
   apps/player/desktop/      本地播放器窗口、会话与无窗口测试
-  packages/native/          跨产品 ImGui 包
+  packages/native/          跨产品 ImGui 与 HTTP 包
   cmake/NativeSDK.cmake      按产品选择 SDK 引擎
 ```
 
