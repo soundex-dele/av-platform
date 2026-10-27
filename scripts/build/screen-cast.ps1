@@ -1,4 +1,4 @@
-param([string]$VcpkgRoot = 'D:/vcpkg', [string]$Go = 'go', [switch]$BootstrapMedia)
+param([string]$VcpkgRoot = 'D:/vcpkg', [string]$Go = 'go', [switch]$BootstrapMedia, [string]$Qt6Dir = '')
 $ErrorActionPreference = 'Stop'
 $Workspace = Split-Path -Parent (Split-Path -Parent $PSScriptRoot)
 function Checked([scriptblock]$Command) { & $Command; if ($LASTEXITCODE -ne 0) { throw "Build failed ($LASTEXITCODE)" } }
@@ -14,7 +14,8 @@ Checked { cmake -S $Sdk -B $SdkBuild -G 'Visual Studio 17 2022' -A x64 "-DCMAKE_
 Checked { cmake --build $SdkBuild --config Release --target livekit_screen_capture_tests livekit_remote_control_tests livekit_sdk_tests livekit_media_graph_tests --parallel 4 }
 $App = Join-Path $Workspace 'livekit-app'
 $CachedSources = @()
-foreach ($Dependency in @('imgui','ixwebsocket','protobuf','sdl2')) {
+if ($Qt6Dir) { $CachedSources += "-DQt6_DIR=$Qt6Dir" }
+foreach ($Dependency in @('ixwebsocket','protobuf','sdl2')) {
     $Source = Join-Path $SdkBuild "_deps/$Dependency-src"
     if (Test-Path -LiteralPath $Source) { $CachedSources += "-DFETCHCONTENT_SOURCE_DIR_$($Dependency.ToUpper())=$Source" }
 }
@@ -30,5 +31,6 @@ try { Checked { npm ci --no-audit --no-fund }; Checked { npm run build }; Checke
 Checked { ctest --test-dir $SdkBuild -C Release -R '^(screen_capture|remote_control|sdk|media_graph)$' --output-on-failure }
 Checked { ctest --test-dir "$Media/out/windows-x64" -C Release --output-on-failure }
 Checked { ctest --test-dir $AppBuild -C Release --output-on-failure }
-Write-Host "Built ImGui host: $AppBuild/Release/av_screen_cast.exe"
+Checked { cmake --install $AppBuild --config Release --prefix "$AppBuild/package" --component ScreenCast }
+Write-Host "Built Qt6 Widgets host: $AppBuild/Release/av_screen_cast.exe"
 Write-Host 'Run scripts/run/screen-cast.ps1 to start the services.'

@@ -1,3 +1,5 @@
+> Qt6 Widgets 双平台改造的本轮结果见 [QT6_VALIDATION.md](QT6_VALIDATION.md)。下文为此前 Windows/ImGui 实现的历史记录，不能视为 Qt6 版本已经通过 Windows 验收。
+
 # 传屏实现与验证记录
 
 日期：2026-10-27（Asia/Shanghai）。代码已实现；以下自动化结果不等于实际设备人工验收。
