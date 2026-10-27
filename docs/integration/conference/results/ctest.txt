@@ -1,0 +1,11 @@
+Test project /Users/xiesongde/workspace/av-platform/livekit-app/out/conference-qt-macos-x86_64
+    Start 1: conference_chat
+1/3 Test #1: conference_chat ..................   Passed    0.06 sec
+    Start 2: conference_audio_devices
+2/3 Test #2: conference_audio_devices .........   Passed    1.71 sec
+    Start 3: conference_widgets
+3/3 Test #3: conference_widgets ...............   Passed    1.99 sec
+
+100% tests passed, 0 tests failed out of 3
+
+Total Test time (real) =   3.81 sec

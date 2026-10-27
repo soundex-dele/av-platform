@@ -1,0 +1,18 @@
+?   	av-platform/business/cmd/business-api	[no test files]
+?   	av-platform/business/cmd/studio-admin	[no test files]
+ok  	av-platform/business/internal/bootstrap	0.601s
+ok  	av-platform/business/internal/businesses/conference	1.358s
+ok  	av-platform/business/internal/businesses/livestudio	(cached)
+?   	av-platform/business/internal/businesses/remotecontrol/application	[no test files]
+?   	av-platform/business/internal/businesses/remotecontrol/domain	[no test files]
+?   	av-platform/business/internal/businesses/remotecontrol/infrastructure	[no test files]
+ok  	av-platform/business/internal/businesses/remotecontrol/transport/http	(cached)
+ok  	av-platform/business/internal/businesses/screencast/application	(cached)
+?   	av-platform/business/internal/businesses/screencast/domain	[no test files]
+ok  	av-platform/business/internal/businesses/screencast/infrastructure	(cached)
+ok  	av-platform/business/internal/businesses/screencast/transport/http	(cached)
+?   	av-platform/business/internal/infrastructure/database	[no test files]
+?   	av-platform/business/internal/infrastructure/http	[no test files]
+ok  	av-platform/business/internal/platform/identity	(cached)
+?   	av-platform/business/internal/platform/media	[no test files]
+?   	av-platform/business/migrations	[no test files]

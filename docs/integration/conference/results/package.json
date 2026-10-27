@@ -1,0 +1,7 @@
+{
+  "codesign_deep_strict": true,
+  "external_non_system_dependencies": [],
+  "offscreen_startup_seconds": 4,
+  "homebrew_libraries_loaded": false,
+  "native_device_acceptance": false
+}

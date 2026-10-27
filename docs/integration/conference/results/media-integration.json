@@ -1,0 +1,9 @@
+{
+  "passed": true,
+  "native_devices": false,
+  "binaries": {
+    "/Users/xiesongde/workspace/av-platform/livekit-app/out/conference-qt-macos-x86_64/Release/livekit_conference_business_integration": "599bd39c272d76c329ae90014ad2d76b1379014ecece7bdc1d6e04f5c1283fd7",
+    "/Users/xiesongde/workspace/av-platform/livekit-cpp/out/conference-macos/livekit-server": "82ebad8ae07f64254a2c4d11002dd1d83549afc406fc64e1cf555876dfdf969b",
+    "/Users/xiesongde/workspace/av-platform/livekit-server/out/conference/business-api": "ca8de9b79262d1233453d35c17c73ef55f1b706efbb59c0f4009f3f31ea9e511"
+  }
+}
