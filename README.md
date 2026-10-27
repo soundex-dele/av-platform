@@ -6,13 +6,15 @@
 
 ## 架构文档
 
+- [Go LiveKit 主服务完整替代](livekit-cpp/docs/GO_REPLACEMENT.md)：固定 1.13.10 行为基线，覆盖协议、媒体、集群和外部 worker 兼容；正在实施，尚未完成替代。
+
 - [视频会议客户端 macOS 构建](livekit-app/apps/conference/desktop/README.md#macos-构建与打包)：Intel / Apple Silicon 构建预设、Retina 适配、独立 `.app` 打包及无窗口验证方法。
 
 - [目录结构与多业务边界](docs/architecture/repository-layout.md)：客户端按 APP/端组织，业务服务按领域组织，包含重构后的构建与 API 入口。
 - [目录重构验证](docs/integration/layout-refactor/VALIDATION.md)：构建矩阵、模块测试、路由隔离与无桌面操作的远控端到端结果。
 
 - [远程协助实现与运行](docs/integration/remote-control/README.md)：浏览器控制 Windows、ImGui 被控端、Go + SQLite 授权服务及无桌面操作的跨仓库验证。
-- [传屏首版实施方案](docs/integration/screen-cast/IMPLEMENTATION.md)：Windows 向浏览器一对一传屏的已确认范围、实现规划与验收要求，尚未实施。
+- [传屏首版实施方案](docs/integration/screen-cast/IMPLEMENTATION.md)：Windows 向浏览器一对一传屏的首版范围；实现与自动化结果见[验证记录](docs/integration/screen-cast/VALIDATION.md)。
 
 - [平台总体设计](docs/architecture/platform-design.md)：仓库职责、跨仓库契约、关键流程、部署和实施阶段。
 - 各仓库设计：[客户端](livekit-app/docs/design.md)、[业务服务](livekit-server/docs/design.md)、[SDK](livekit-sdk-cpp/docs/design.md)、[媒体服务](livekit-cpp/docs/design.md)、[GraphFlow](graphflow-cpp/docs/design.md)、[WebRTC](webrtc/docs/av-platform-design.md)。

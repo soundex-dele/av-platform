@@ -1,3 +1,6 @@
 .DS_Store
 /build/
 /out/
+/logs/
+__pycache__/
+*.pyc

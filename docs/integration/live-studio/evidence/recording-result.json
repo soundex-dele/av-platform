@@ -1,0 +1,28 @@
+{
+  "file": "D:\\workspace\\av-platform\\livekit-app\\out\\live-studio\\integration-1793095155434\\host_a.mp4",
+  "decode": "passed",
+  "video_codec": "h264",
+  "audio_codec": "aac",
+  "width": 1280,
+  "height": 720,
+  "video_duration": "24.033000",
+  "audio_duration": "24.021000",
+  "frames": "415",
+  "average_fps": 17.267923272167437,
+  "marker_measurement": {
+    "method": "pre-interaction local flash/beep onsets, 60 Hz video and 10 ms audio sampling",
+    "interval_seconds": [
+      0,
+      8
+    ],
+    "video_edges": 4,
+    "audio_edges": 5,
+    "offsets_ms": [
+      0,
+      40.000000000000036,
+      43.333333333333,
+      -23.333333333333428
+    ],
+    "max_abs_offset_ms": 43.333333333333
+  }
+}

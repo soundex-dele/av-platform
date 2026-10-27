@@ -1,0 +1,9 @@
+{
+  "checks": [
+    "packaged service deployment script and health endpoints",
+    "packaged Web assets",
+    "packaged identity and SQLite migrations",
+    "packaged desktop DLL loading and hidden UI render"
+  ],
+  "result": "passed"
+}

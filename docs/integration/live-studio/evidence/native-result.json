@@ -1,0 +1,31 @@
+{
+  "checks": [
+    "two native Studio publishers through admission hook",
+    "registration, viewer admission and decoded video",
+    "native decoded flash and audio markers measured",
+    "ordered WebSocket chat",
+    "gift debit and balance refresh",
+    "approved guest publishes camera/microphone fixtures",
+    "native host composites guest return video",
+    "SFU rejects revoked stage grant",
+    "two native hosts exchange clean stage video for PK",
+    "PK invite, consent, scoring and forfeit",
+    "responsive viewer screenshots",
+    "server-authoritative moderation",
+    "stop revokes room and ends viewer",
+    "native recording finalization"
+  ],
+  "result": "passed",
+  "native_av": {
+    "method": "received flash/beep onset via canvas and WebAudio, headless loopback, RAF sampling",
+    "video_edges": 4,
+    "audio_edges": 6,
+    "offsets_ms": [
+      0,
+      66.60000000009313,
+      -4.600000000093132
+    ],
+    "max_abs_offset_ms": 66.60000000009313,
+    "target_met": true
+  }
+}
