@@ -6,6 +6,8 @@
 
 ## 架构文档
 
+- [直播助手 macOS 构建](livekit-app/apps/live-studio/desktop/README.md)：原生采集与合成后端、一键编译、`.app` 打包和无窗口验证。
+
 - [Go LiveKit 主服务完整替代](livekit-cpp/docs/GO_REPLACEMENT.md)：固定 1.13.10 行为基线，覆盖协议、媒体、集群和外部 worker 兼容；正在实施，尚未完成替代。
 
 - [视频会议客户端 macOS 构建](livekit-app/apps/conference/desktop/README.md#macos-构建与打包)：Intel / Apple Silicon 构建预设、Retina 适配、独立 `.app` 打包及无窗口验证方法。
