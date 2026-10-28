@@ -1,12 +1,13 @@
 param([string]$FFmpegInclude='', [string]$WebRTCBuild='')
 $ErrorActionPreference='Stop'
 $workspace=Split-Path (Split-Path $PSScriptRoot -Parent) -Parent
-$build=Join-Path $workspace 'livekit-app/out/live-studio'
+$build=Join-Path $workspace 'livekit-app/out/live-studio-qt6'
 $mediaBuild=Join-Path $workspace 'livekit-cpp/out/windows-x64'
 if (!$WebRTCBuild) { $WebRTCBuild=Join-Path $workspace 'livekit-sdk-cpp/out/windows-x64' }
 $destination=Join-Path $workspace ('out/packages/live-studio-'+(Get-Date -Format 'yyyyMMdd-HHmmss'))
  New-Item -ItemType Directory -Path $destination -Force | Out-Null
- Copy-Item -LiteralPath (Join-Path $build 'Release/av_live_studio.exe') -Destination $destination
+ & cmake --install $build --config Release --prefix $destination --component LiveStudio
+ if ($LASTEXITCODE -ne 0) { throw 'Qt Live Studio deployment failed.' }
  Get-ChildItem -LiteralPath (Join-Path $build 'Release') -Filter '*.dll' | Copy-Item -Destination $destination
  Copy-Item -LiteralPath (Join-Path $workspace 'livekit-app/apps/live-studio/README.md') -Destination $destination
  Copy-Item -LiteralPath (Join-Path $workspace 'scripts/run/live-studio-package.ps1') -Destination (Join-Path $destination 'start-services.ps1')
@@ -19,15 +20,15 @@ $destination=Join-Path $workspace ('out/packages/live-studio-'+(Get-Date -Format
  $licenses=Join-Path $destination 'licenses'
  New-Item -ItemType Directory -Path $licenses -Force | Out-Null
  $licenseSources=@{
- 'SDL2.txt'=(Join-Path $build '_deps/sdl2-src/LICENSE.txt')
- 'ImGui.txt'=(Join-Path $WebRTCBuild '_deps/imgui-src/LICENSE.txt')
+ # FFmpeg avdevice may still depend on SDL even though the UI is now Qt.
+ 'SDL2.txt'=(Join-Path $WebRTCBuild '_deps/sdl2-src/LICENSE.txt')
  'FFmpeg-GPLv3.txt'=$(if($FFmpegInclude){Join-Path $FFmpegInclude 'COPYING.GPLv3'}else{''})
  'WebRTC.txt'=(Join-Path $workspace 'webrtc/LICENSE')
  'SDK.txt'=(Join-Path $workspace 'livekit-sdk-cpp/LICENSE')
  }
  foreach($entry in $licenseSources.GetEnumerator()){if($entry.Value -and (Test-Path -LiteralPath $entry.Value)){Copy-Item -LiteralPath $entry.Value -Destination (Join-Path $licenses $entry.Key)}}
 
- Write-Host "Desktop package: $destination. See README for FFmpeg/SDL license requirements."
+ Write-Host "Desktop package: $destination. See README for Qt/FFmpeg license requirements."
 
 $manifest=Get-ChildItem -LiteralPath $destination -Recurse -File | Where-Object { $_.Extension -in '.exe','.dll' } | ForEach-Object { @{file=[System.IO.Path]::GetRelativePath($destination,$_.FullName);sha256=(Get-FileHash -LiteralPath $_.FullName -Algorithm SHA256).Hash} }
 @{created=(Get-Date -Format o);source='uncommitted workspace build';files=@($manifest)} | ConvertTo-Json -Depth 5 | Set-Content -LiteralPath (Join-Path $destination 'manifest.json') -Encoding utf8NoBOM
