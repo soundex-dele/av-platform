@@ -2,6 +2,10 @@
 
 评估日期：2026-10-27（北京时间）。
 
+**当前验收口径**：用户已确认只需模拟测试，不要求真机实测。见 [34 项模拟验收结果](../testing/uav-sfu-go-cpp-simulation-acceptance.md)，其中已有通过项；下文及历史报告的真机条件不再作为本轮门槛。
+
+最新复测：见 [2026-10-28 严格传输策略与完整 34 项复测状态](../testing/uav-sfu-go-cpp-revalidation-20261028.md)。该轮继续使用 Go 服务端和原生 C++ SDK，新增客户端 UDP/TCP 强约束、负向测试及并行媒体场景；完整需求仍有未通过和未测项。
+
 后续已按用户授权完成本机测试及部分修复：见 [Go SFU + C++ SDK 验证与修复报告](../testing/uav-sfu-go-cpp-validation-report.md) 和 [34 项测试说明](../testing/uav-sfu-go-cpp-tests.md)。服务端使用 `D:/workspace/livekit`，媒体客户端使用本工作区的 C++ SDK。
 
 **阅读口径：下文保留修复前的源码评估和最初执行记录，作为问题基线。当前执行结果、已修复默认统计周期及 SDK 编解码能力以验证与修复报告为准；本机自动化不代表实机或 34 项完整验收通过。**

@@ -1,5 +1,9 @@
 # Go LiveKit SFU + C++ SDK：本机需求验证与修复报告
 
+**当前结果按模拟验收**：用户已明确无需真机，见 [模拟验收报告](uav-sfu-go-cpp-simulation-acceptance.md)。下文完整产品／设备验收结论作为历史记录保留。
+
+**最新复测与新增实现**：见 [2026-10-28 严格传输策略及 34 项当前状态](uav-sfu-go-cpp-revalidation-20261028.md)。下文保留此前执行记录；最新报告单独区分本机子项与完整需求验收。
+
 更新日期：2026-10-28（含 2026-10-27 历史记录）。基线：[V1.11 需求评估](../architecture/uav-sfu-go-requirements-assessment.md)，共 34 项。用户已授权执行、修复，并将本轮范围明确为本机验证；未进行 ARM64、Android、iOS、Web 实机验收。
 
 ## 1. 结论

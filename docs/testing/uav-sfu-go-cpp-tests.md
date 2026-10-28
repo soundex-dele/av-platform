@@ -2,6 +2,10 @@
 
 对应 [Go 版本需求评估](../architecture/uav-sfu-go-requirements-assessment.md)，基线为 V1.11 的 34 项需求。
 
+**最新口径：以模拟测试验收，不要求真机。** 运行器按具体断言判定模拟通过，区分“部分通过待补模拟”和“尚未模拟”；缺失软件能力和性能模拟证据仍保留。当前 [模拟结果与复现入口](uav-sfu-go-cpp-simulation-acceptance.md) 优先于下文历史设备验收条件。
+
+2026-10-28 本次扩展：客户端严格 `MediaTransport`、H.265/TCP、反向协议拒绝、两实例并行视频／语音、可选 TCP 重复轮次和 UDP/TCP 恢复测试。见 [本次复测与完整矩阵](uav-sfu-go-cpp-revalidation-20261028.md) 及 [SDK 策略说明](../../livekit-sdk-cpp/docs/media-transport-policy.md)。下文早期六场景说明保留作为基线；当前运行器默认 11 场景，`--tcp-repeats 3` 运行 15 场景，回归测试中的媒体客户端仍全部为 C++。
+
 本文件描述测试代码和验收用例。用户已授权执行并尝试修复，并确认本轮范围为本机无窗口验证；实机条件不在本轮。执行结果与剩余缺口见 [验证与修复报告](uav-sfu-go-cpp-validation-report.md)，不能仅因用例存在就视为验收通过。
 
 ## 1. 测试对象和边界
@@ -9,7 +13,7 @@
 - 服务端固定从 `D:/workspace/livekit` 的 Go 源码构建；不使用 C++ SFU，也不替换成历史 Go 二进制。报告记录提交、工作区状态、go.mod/go.sum 摘要和二进制 SHA256。
 - 所有媒体客户端使用 `D:/workspace/av-platform/livekit-sdk-cpp` 的原生 C++ SDK。Python 只负责启动、清理和整理证据，不发布媒体；没有 Go SDK 客户端。
 - 不访问摄像头、麦克风、扬声器或桌面。C++ 用例生成两种 I420 画面和三个频率的 PCM，检查远端真实解码输出。
-- UDP-only、TCP-only 每个场景各启一个回环地址上的独立 Go 实例，禁用 TURN 与协议自动回退。当前场景按顺序执行，尚不验证两个媒体实例同时工作的资源竞争和业务隔离。
+- UDP-only、TCP-only 每个基础场景各启一个回环地址上的独立 Go 实例，禁用 TURN 与协议自动回退。新增 `simultaneous` 组同时运行 UDP H.265＋多人语音及 TCP H.265 两实例，验证本机低负载并行；不等于额定容量或完整业务隔离验收。
 - 实例使用 `rtc.ips.includes: [127.0.0.1/32]`，避免将不同物理接口都公告为回环地址后造成 TCP mux 地址不一致。TCP 已有成功记录，但完整复跑仍出现间歇 `WebRTC transport failed`，详见修复报告；单次重试成功不关闭问题。
 - 默认视频样本为 320×180 的 H.264，用于基础互通和内容识别；不是要求的 H.265 720p30、2 Mbps 容量负载。合成视频也不是实际设备回放文件。
 - 只认 Go 服务端日志中已经选中的 ICE 候选对。验证发布端上行与每个观看端下行的 `localProtocol`、`remoteProtocol`，拒绝 relay；不以 WSS/信令 TCP、监听端口或 SDP 候选出现代替媒体协议证明。
