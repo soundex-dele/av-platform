@@ -2,7 +2,9 @@
 
 评估日期：2026-10-27（北京时间）。
 
-后续测试用例已编写：[Go SFU + C++ SDK 测试说明与 34 项验收用例](../testing/uav-sfu-go-cpp-tests.md)。服务端使用 `D:/workspace/livekit`，媒体客户端使用本工作区的 C++ SDK。用户要求先编写、不运行；最终测试版本尚未执行验收，以下评估结论不因用例存在而自动升级为通过。
+后续已按用户授权完成本机测试及部分修复：见 [Go SFU + C++ SDK 验证与修复报告](../testing/uav-sfu-go-cpp-validation-report.md) 和 [34 项测试说明](../testing/uav-sfu-go-cpp-tests.md)。服务端使用 `D:/workspace/livekit`，媒体客户端使用本工作区的 C++ SDK。
+
+**阅读口径：下文保留修复前的源码评估和最初执行记录，作为问题基线。当前执行结果、已修复默认统计周期及 SDK 编解码能力以验证与修复报告为准；本机自动化不代表实机或 34 项完整验收通过。**
 
 - 需求基线：`D:/workspace/sdk/无人机音视频 SFU 需求说明.md`，V1.11，共 34 项需求。
 - 评估对象：`D:/workspace/livekit`，Go LiveKit Server，提交 `a390d03d28c895742d9b13c0894880ee67733801`；评估开始时 Git 工作区无修改。

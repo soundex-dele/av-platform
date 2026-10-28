@@ -2,7 +2,7 @@
 
 对应 [Go 版本需求评估](../architecture/uav-sfu-go-requirements-assessment.md)，基线为 V1.11 的 34 项需求。
 
-当前交付为测试代码和验收用例。用户补充“先编写测试但不运行”后停止执行；本文不发布完整需求通过结论。补充指令前曾进行构建、部分 Go 检查和初步互通尝试，工作目录中的中间产物不代表本版测试已完整执行。最后的测试代码修改尚未重新编译或运行。
+本文件描述测试代码和验收用例。用户已授权执行并尝试修复，并确认本轮范围为本机无窗口验证；实机条件不在本轮。执行结果与剩余缺口见 [验证与修复报告](uav-sfu-go-cpp-validation-report.md)，不能仅因用例存在就视为验收通过。
 
 ## 1. 测试对象和边界
 
@@ -10,6 +10,7 @@
 - 所有媒体客户端使用 `D:/workspace/av-platform/livekit-sdk-cpp` 的原生 C++ SDK。Python 只负责启动、清理和整理证据，不发布媒体；没有 Go SDK 客户端。
 - 不访问摄像头、麦克风、扬声器或桌面。C++ 用例生成两种 I420 画面和三个频率的 PCM，检查远端真实解码输出。
 - UDP-only、TCP-only 每个场景各启一个回环地址上的独立 Go 实例，禁用 TURN 与协议自动回退。当前场景按顺序执行，尚不验证两个媒体实例同时工作的资源竞争和业务隔离。
+- 实例使用 `rtc.ips.includes: [127.0.0.1/32]`，避免将不同物理接口都公告为回环地址后造成 TCP mux 地址不一致。TCP 已有成功记录，但完整复跑仍出现间歇 `WebRTC transport failed`，详见修复报告；单次重试成功不关闭问题。
 - 默认视频样本为 320×180 的 H.264，用于基础互通和内容识别；不是要求的 H.265 720p30、2 Mbps 容量负载。合成视频也不是实际设备回放文件。
 - 只认 Go 服务端日志中已经选中的 ICE 候选对。验证发布端上行与每个观看端下行的 `localProtocol`、`remoteProtocol`，拒绝 relay；不以 WSS/信令 TCP、监听端口或 SDP 候选出现代替媒体协议证明。
 
@@ -22,11 +23,11 @@
 | `livekit-sdk-cpp/tests/go_requirements/config_test.go` | 默认 codec、视频 FEC 注册、BWE 和节点统计间隔取证 |
 | `livekit-sdk-cpp/tests/go_requirements/pacer_test.go` | PassThrough 突发发送和 NoQueue 阻塞写入后的队列增长取证 |
 | `livekit-sdk-cpp/tests/go_requirements/dynacast_test.go` | H.265→H.264 的聚合控制状态迁移测试 |
-| `livekit-sdk-cpp/tests/test_uav_requirements_runner.py` | 报告判定防误报测试：缺证据、协议错误、relay、构建失败、H.265 拒绝 |
+| `livekit-sdk-cpp/tests/test_uav_requirements_runner.py` | 5 个报告判定测试：缺证据、协议错误、relay、构建失败、H.265 拒绝及 TCP 媒体失败 |
 
-Go 用例通过 `go test -overlay` 注入对应 package，测试实际 Go 实现；不修改 `D:/workspace/livekit` 中的生产文件或依赖版本。运行结束保留 overlay 和原始日志以便追溯。
+取证用 Go 用例通过 `go test -overlay` 注入对应 package，测试实际 Go 实现。另有本轮修复及回归用例直接位于 `D:/workspace/livekit`；详见修复报告。依赖版本保持锁定，运行结束保留 overlay 和原始日志以便追溯。
 
-以下命令仅供之后手动执行，当前不执行：
+复现命令如下。H.264/H.265 需要先按 [可选 FFmpeg RTC 后端说明](../../livekit-sdk-cpp/docs/rtc-ffmpeg-codecs.md) 配置匹配的编解码依赖：
 
 ```powershell
 Set-Location D:/workspace/av-platform
@@ -50,6 +51,8 @@ python -m unittest discover -s livekit-sdk-cpp/tests `
 首次配置 SDK 构建环境请参照 SDK 的 CMake 配置；不能把旧客户端可执行文件当作新用例。H.264 编解码后端必须实际存在于当前 WebRTC 构建中；没有后端时用例应报 `Video codec not available: h264`。H.265 同样必须得到 SDK API 和后端支持，不允许偷偷降到 VP8 后宣称通过。
 
 输出位置为 `out/uav-sfu-go/<北京时间戳>/`，包含 `report.md`、`result.json`、服务端构建信息、Go 测试 JSONL、每个场景的配置/服务端日志/客户端日志/选中协议证据。测试 API key 仅供回环隔离实例使用。
+
+需要排查原生 ICE 时，可在独立测试进程设置 `LIVEKIT_UAV_NATIVE_LOG=1`；默认关闭。该选项会增加原生传输诊断，日志只在本地测试证据目录保存，分享前需检查其中的网络地址和 ICE 信息。
 
 退出码：`0` 表示已执行子项无失败且未检测到已知缺口；`1` 表示子项失败、Go 探针失败或发现需求缺口；`2` 表示全局准备失败。**任何退出码都不能代替 34 项完整验收**，完整状态仍以矩阵和剩余验收条件为准。
 
