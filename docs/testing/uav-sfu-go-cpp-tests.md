@@ -23,7 +23,8 @@
 | `livekit-sdk-cpp/tests/go_requirements/config_test.go` | 默认 codec、视频 FEC 注册、BWE 和节点统计间隔取证 |
 | `livekit-sdk-cpp/tests/go_requirements/pacer_test.go` | PassThrough 突发发送和 NoQueue 阻塞写入后的队列增长取证 |
 | `livekit-sdk-cpp/tests/go_requirements/dynacast_test.go` | H.265→H.264 的聚合控制状态迁移测试 |
-| `livekit-sdk-cpp/tests/test_uav_requirements_runner.py` | 5 个报告判定测试：缺证据、协议错误、relay、构建失败、H.265 拒绝及 TCP 媒体失败 |
+| `livekit-sdk-cpp/tests/test_uav_requirements_runner.py` | 6 个报告判定测试：缺证据、协议错误、relay、构建失败、H.265 拒绝、TCP 媒体失败及 dynacast 失败归因 |
+| `livekit-sdk-cpp/tests/subscribed_quality_contract.hpp` | 上游 wire field 14、当前/外来 codec、ON/OFF、未知质量、旧格式及不支持源类型的契约 |
 
 取证用 Go 用例通过 `go test -overlay` 注入对应 package，测试实际 Go 实现。另有本轮修复及回归用例直接位于 `D:/workspace/livekit`；详见修复报告。依赖版本保持锁定，运行结束保留 overlay 和原始日志以便追溯。
 
@@ -69,6 +70,7 @@ python -m unittest discover -s livekit-sdk-cpp/tests `
 | `voice_leave_preserves_video_and_other_voice` | B 保持视频发布但撤掉音频；B 仍连接，视频继续解码，A 与无人机两方向音频各继续收到 >20 块；B 音频不得继续输出 | A-05 的正常退出子项 | 授权到期、异常断连、服务端迟到清理 |
 | `selected_ice_protocol` | 解析选中候选对；视频要求 drone/PUBLISHER、A/SUBSCRIBER、B/SUBSCRIBER；三方音频要求每端 publisher/subscriber，全部符合指定协议且非 relay | V-13、B-07 | 真实三端平台、跨网络、重连坚持协议 |
 | `udp-video-h265` | 请求 H.265 执行真实多轨场景；SDK 拒绝该编码或后端缺失必须失败 | V-12 的前置条件 | 该场景本身不执行 H.265→H.264 动态切换 |
+| `udp-dynacast-h264` / `udp-dynacast-h265` | 开启 `MediaSpec::dynacast`；0→1→2→1→0→1 观看者；单人离开后等待 6 s 仍持续解码，无人观看时源消费和保留的 RTP 字节统计停止增长，重新订阅同 SID 恢复解码 | V-08 的本机单层实时源控制 | 首次 bootstrap 流量、硬编实机启停、质量层选择、全体编码回退及专项重连 |
 | `TestUAVH265H264Regression` | 先聚合 H.265 观看需求，再调用真实 dynacast regression，等待 H.265 停用、H.264 启用 | V-08、V-12 的服务端控制子项 | 机载真正换编码、原观看者重新协商/解码 |
 
 超时作为失败保留日志。单个场景失败不阻止后续场景执行。全体回退尚缺业务端编码控制接口，不能用两次独立发布或静态 codec 参数伪造完整通过。
