@@ -24,6 +24,6 @@ try { Checked $Go @('test','./...'); Checked $Go @('vet','./...'); Checked $Go @
 Push-Location (Join-Path $workspace 'livekit-app/apps/live-studio/web')
 try { Checked 'npm.cmd' @('ci','--ignore-scripts'); Checked 'npm.cmd' @('run','build'); Checked 'npm.cmd' @('test') } finally { Pop-Location }
 Checked 'cmake' @('-S',(Join-Path $workspace 'livekit-app/apps/live-studio/desktop'),'-B',$build,'-G','Visual Studio 17 2022','-A','x64',"-DCMAKE_TOOLCHAIN_FILE=$VcpkgRoot/scripts/buildsystems/vcpkg.cmake",'-DVCPKG_TARGET_TRIPLET=x64-windows-static',"-DWEBRTC_PREBUILT_DIR=$WebRTCBuild","-DLIVEKIT_FFMPEG_ROOT=$FFmpegRoot","-DLIVEKIT_FFMPEG_INCLUDE=$FFmpegInclude",'-DBUILD_TESTING=ON')
-Checked 'cmake' @('--build',$build,'--config','Release','--target','av_live_studio','studio_engine_tests','studio_media_graph_tests','studio_publisher_fixture','--parallel','2')
+Checked 'cmake' @('--build',$build,'--config','Release','--target','av_live_studio','studio_engine_tests','studio_graph_tests','studio_media_graph_tests','studio_publisher_fixture','--parallel','2')
 Checked 'ctest' @('--test-dir',$build,'-C','Release','--output-on-failure')
 if ($Package) { & (Join-Path $PSScriptRoot 'package-live-studio.ps1') -FFmpegInclude $FFmpegInclude -WebRTCBuild $WebRTCBuild }
