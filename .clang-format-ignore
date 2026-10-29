@@ -1,0 +1,29 @@
+# GraphFlow (including utoolkit) retains its module conventions.
+graphflow-cpp/**
+
+# Upstream source trees retain their own formatting conventions.
+webrtc/**
+livekit-sdk-cpp/protocol/upstream/**
+
+# Vendored dependencies and generated/build outputs at any nesting level.
+# Recursive globstar patterns require clang-format 20 or later.
+**/third_party/**
+**/third-party/**
+**/vendor/**
+**/external/**
+**/node_modules/**
+**/_deps/**
+**/build/**
+**/build-*/**
+**/build_*/**
+**/cmake-build-*/**
+**/out/**
+**/dist/**
+**/generated/**
+**/*.pb.h
+**/*.pb.cc
+**/*.pb.cpp
+**/moc_*.cpp
+**/mocs_compilation*.cpp
+**/ui_*.h
+**/qrc_*.cpp

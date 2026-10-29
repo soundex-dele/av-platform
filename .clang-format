@@ -1,0 +1,28 @@
+# Formatting baseline: clang-format 20.1.8.
+# Pass explicit first-party file paths; exclusions are in .clang-format-ignore.
+BasedOnStyle: Google
+IndentWidth: 2
+ContinuationIndentWidth: 4
+TabWidth: 2
+UseTab: Never
+ColumnLimit: 100
+BreakBeforeBraces: Attach
+AccessModifierOffset: -1
+NamespaceIndentation: None
+DerivePointerAlignment: false
+PointerAlignment: Left
+ReferenceAlignment: Left
+AllowShortFunctionsOnASingleLine: Empty
+AllowShortIfStatementsOnASingleLine: Never
+AllowShortLoopsOnASingleLine: false
+AllowShortBlocksOnASingleLine: Never
+# Separate adjacent definitions with one blank line.
+SeparateDefinitionBlocks: Always
+MaxEmptyLinesToKeep: 1
+# Keep order-sensitive platform headers and existing include groups intact.
+SortIncludes: Never
+IncludeBlocks: Preserve
+# Preserve prose, diagrams and API documentation in comments.
+ReflowComments: false
+FixNamespaceComments: true
+LineEnding: DeriveLF

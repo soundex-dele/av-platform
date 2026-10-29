@@ -4,6 +4,10 @@
 
 当前阶段是架构设计与已有模块整合，完整平台和统一 SDK 尚未实现。
 
+## 开发规范
+
+- [代码规范与 clang-format 使用说明](docs/development/coding-standard.md)：固定 clang-format 20.1.8，提供原生代码格式、命名、生命周期、并发和验证约定。配置用于后续增量改动，不要求批量格式化存量源码；GraphFlow 沿用其模块惯例。
+
 ## 架构文档
 
 - [直播助手 macOS 构建](livekit-app/apps/live-studio/desktop/README.md)：原生采集与合成后端、一键编译、`.app` 打包和无窗口验证。
