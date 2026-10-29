@@ -4,7 +4,7 @@
 
 本文记录当前讨论确定的架构方向。除“现有模块”部分明确列出的能力外，模块名、接口名和执行策略均为设计目标，示意代码不代表已有可调用 API。
 
-平台职责和跨仓库接口见 [总体设计](platform-design.md)。2026-10-29 的 RTC 实现已采用共享 RoomSession、分离发布/订阅节点和每轨 GraphEngine，旧 Room facade 已删除。当前可调用接口见 [编码媒体 API](../../livekit-sdk-cpp/docs/rtc-encoded-api.md)，构建及验证证据见 [实施记录](../../livekit-sdk-cpp/docs/rtc-backend-refactor.md)。本文其他模块仍是设计草案。
+平台职责和跨仓库接口见 [总体设计](platform-design.md)。2026-10-29 的 RTC 实现已采用共享 RoomEngine、分离发布/订阅节点和每轨 GraphEngine，旧 Room facade 已删除。当前可调用接口见 [编码媒体 API](../../livekit-sdk-cpp/docs/rtc-encoded-api.md)，构建及验证证据见 [实施记录](../../livekit-sdk-cpp/docs/rtc-backend-refactor.md)。本文其他模块仍是设计草案。
 
 ## 1. 目标与范围
 
@@ -191,9 +191,9 @@ GraphFlow 提供图组织、节点工厂、生命周期、控制事件等基础�
 
 节点粒度以独立配置、复用和调度的能力边界为准。复合节点和子图是目标能力，不表示当前 GraphFlow 已具备完整实现。
 
-当前 `RtcPublishNode` 接收编码帧，`RtcSubscribeNode` 输出编码帧。原始输入显式连接上层编码节点，原始输出显式连接解码节点。`RtcEngine` 为各轨创建独立 GraphEngine，多个发布/订阅节点共享同一个 RoomSession；关闭一条轨道不会退会。
+当前 `RtcPublishNode` 接收编码帧，`RtcSubscribeNode` 输出编码帧。原始输入显式连接上层编码节点，原始输出显式连接解码节点。`RtcEngine` 统一协调房间、可选媒体模块和内部 `RtcPipelineEngine`，由后者为各轨创建独立 GraphEngine，多个发布/订阅节点共享同一个 RoomEngine；关闭一条轨道不会退会。
 
-普通 Session 通过可选 `RtcMediaEngine` 提交 `MediaPublishSpec` / `MediaSubscribeSpec`，不传入采集节点或图工厂。媒体引擎创建输入、编解码、预览、播放和录制节点并接入每轨图；Session 负责业务编排、媒体配置、应用供帧及快照/回调交接。外部数据源采用可释放的借用关系；`SharedMediaInput` 用独立源图向多个发布的有界队列分发原始帧，可跨房间复用，最后一个消费者退出后停止采集。纯编码传输仍可只链接 RoomSession / RtcEngine，高级自定义图保留在 RtcEngine。接口、线程和格式边界见 [媒体引擎 API](../../livekit-sdk-cpp/docs/rtc-media-engine.md)。
+普通 Session 通过统一 `RtcEngine` 提交 `MediaPublishSpec` / `MediaSubscribeSpec`，不传入采集节点或图工厂。媒体引擎创建输入、编解码、预览、播放和录制节点并接入每轨图；Session 负责业务编排、媒体配置、应用供帧及快照/回调交接。外部数据源采用可释放的借用关系；`SharedMediaInput` 用独立源图向多个发布的有界队列分发原始帧，可跨房间复用，最后一个消费者退出后停止采集。纯编码传输仍可只链接 RoomEngine / RtcEngine，高级自定义图保留在 RtcEngine。RtcEngine 的 `room()` 返回受控 RoomView，事件通过 `next_event()` 消费；`leave()` 完成媒体关闭屏障后退房，允许使用新适配器与新 epoch 再次入房，`close()` 永久终止引擎。内部 RtcMediaEngine 不对应用公开。接口、线程和格式边界见 [媒体引擎 API](../../livekit-sdk-cpp/docs/rtc-media-engine.md)。
 
 典型图：
 
