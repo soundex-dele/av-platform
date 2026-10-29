@@ -4,7 +4,7 @@
 
 本文记录当前讨论确定的架构方向。除“现有模块”部分明确列出的能力外，模块名、接口名和执行策略均为设计目标，示意代码不代表已有可调用 API。
 
-平台职责和跨仓库接口见 [总体设计](platform-design.md)，SDK 当前源码结构和迁移步骤见 [SDK 仓库设计](../../livekit-sdk-cpp/docs/design.md)。当前媒体状态以 [RTC 交接快照](../integration/rtc/STATUS_AND_HANDOFF.md)为准，本次文档更新未重新执行测试。
+平台职责和跨仓库接口见 [总体设计](platform-design.md)。2026-10-29 的 RTC 实现已采用共享 RoomBackend、分离发布/订阅节点和每轨 GraphEngine，旧 Room facade 已删除。当前可调用接口见 [编码媒体 API](../../livekit-sdk-cpp/docs/rtc-encoded-api.md)，构建及验证证据见 [实施记录](../../livekit-sdk-cpp/docs/rtc-backend-refactor.md)。本文其他模块仍是设计草案。
 
 ## 1. 目标与范围
 
@@ -72,7 +72,7 @@ flowchart TB
     Core --> Backend
 ```
 
-图中箭头表达职责依赖，不要求所有媒体帧机械地穿过每一层。WebRTC 自己拥有的编解码、抖动缓冲和网络线程保留在 RTC 后端内部，通过媒体接口与节点连接。
+图中箭头表达职责依赖，不要求所有媒体帧机械地穿过每一层。RTC backend 拥有信令、封包/解包和网络线程，以拥有数据的完整编码帧交接。实际编解码、设备输入输出和播放策略位于上层媒体节点；仅收发编码数据时无需创建这些节点。
 
 ## 4. 公共接口与图的所有权
 
@@ -191,7 +191,9 @@ GraphFlow 提供图组织、节点工厂、生命周期、控制事件等基础�
 
 节点粒度以独立配置、复用和调度的能力边界为准。复合节点和子图是目标能力，不表示当前 GraphFlow 已具备完整实现。
 
-`RtcPublish` 可接收原始帧，由 WebRTC 内部编码并传输；只有后端明确支持编码帧输入时，才连接外部编码器，避免重复编码。
+当前 `RtcPublishNode` 接收编码帧，`RtcSubscribeNode` 输出编码帧。原始输入显式连接上层编码节点，原始输出显式连接解码节点。`RtcEngine` 为各轨创建独立 GraphEngine，多个发布/订阅节点共享同一个 RoomBackend；关闭一条轨道不会退会。
+
+普通 Session 通过可选 `RtcMediaEngine` 提交 `MediaPublishSpec` / `MediaSubscribeSpec`，不传入采集节点或图工厂。媒体引擎创建输入、编解码、预览、播放和录制节点并接入每轨图；Session 负责业务编排、媒体配置、应用供帧及快照/回调交接。外部数据源采用可释放的借用关系；`SharedMediaInput` 用独立源图向多个发布的有界队列分发原始帧，可跨房间复用，最后一个消费者退出后停止采集。纯编码传输仍可只链接 RoomBackend / RtcEngine，高级自定义图保留在 RtcEngine。接口、线程和格式边界见 [媒体引擎 API](../../livekit-sdk-cpp/docs/rtc-media-engine.md)。
 
 典型图：
 
