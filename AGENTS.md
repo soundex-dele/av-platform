@@ -1,5 +1,9 @@
 # 仓库协作约定
 
+## 代码规范
+
+- `livekit-sdk-cpp`、`livekit-app`、`livekit-cpp` 中本项目维护的原生代码遵循 [代码规范](docs/development/coding-standard.md)。
+
 ## 音视频流水线
 
 - 后续新增或改造音视频流水线时，尽量优先使用 `GraphEngine`。
