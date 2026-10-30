@@ -1,0 +1,119 @@
+{
+  "renderer": "mermaid 10.9.3 / headless Chromium",
+  "checks": {
+    "sections": 15,
+    "svgs": 15,
+    "missingDiagrams": 0,
+    "pageOverflow": false,
+    "zoomWorks": true,
+    "sourceLinks": 54,
+    "missingSourceLinks": []
+  },
+  "diagrams": [
+    {
+      "id": "00",
+      "title": "SDK 全模块总体类图",
+      "width": 1063.83984375,
+      "height": 1243,
+      "nodes": 18
+    },
+    {
+      "id": "01",
+      "title": "RTC 总体类图",
+      "width": 1925.4375,
+      "height": 1056,
+      "nodes": 16
+    },
+    {
+      "id": "02",
+      "title": "示例应用与 SDK 入口",
+      "width": 1662.8515625,
+      "height": 879,
+      "nodes": 15
+    },
+    {
+      "id": "03",
+      "title": "公共门面、媒体配置与句柄",
+      "width": 2506.578125,
+      "height": 925,
+      "nodes": 20
+    },
+    {
+      "id": "04",
+      "title": "每轨管线与 GraphFlow 生命周期",
+      "width": 996.91015625,
+      "height": 1359,
+      "nodes": 13
+    },
+    {
+      "id": "05",
+      "title": "发布模块：输入、编码与反馈",
+      "width": 1967.421875,
+      "height": 621.5,
+      "nodes": 9
+    },
+    {
+      "id": "06",
+      "title": "订阅模块：解码、同步、显示与播放",
+      "width": 2059.625,
+      "height": 481,
+      "nodes": 12
+    },
+    {
+      "id": "07",
+      "title": "房间、轨道端点与控制模块",
+      "width": 1315.8984375,
+      "height": 894,
+      "nodes": 13
+    },
+    {
+      "id": "08",
+      "title": "LiveKit 信令与 WebRTC 后端",
+      "width": 1776.296875,
+      "height": 829,
+      "nodes": 17
+    },
+    {
+      "id": "09",
+      "title": "帧、时间、队列和错误契约",
+      "width": 1317.60546875,
+      "height": 954,
+      "nodes": 15
+    },
+    {
+      "id": "10",
+      "title": "可选共享输入与音频处理",
+      "width": 1082.8125,
+      "height": 856,
+      "nodes": 13
+    },
+    {
+      "id": "11",
+      "title": "房间数据服务与 ServerSDK",
+      "width": 1763.69140625,
+      "height": 627,
+      "nodes": 16
+    },
+    {
+      "id": "12",
+      "title": "Player 模块（示例未使用）",
+      "width": 991.69140625,
+      "height": 1357,
+      "nodes": 15
+    },
+    {
+      "id": "13",
+      "title": "Studio 模块（示例未使用）",
+      "width": 1558.62109375,
+      "height": 1338,
+      "nodes": 19
+    },
+    {
+      "id": "14",
+      "title": "RemoteControl 模块（示例未使用）",
+      "width": 701.328125,
+      "height": 800,
+      "nodes": 8
+    }
+  ]
+}
